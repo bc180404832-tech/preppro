@@ -1,0 +1,1718 @@
+[
+  {
+    "id": "sr-react-01",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React Fiber Architecture",
+    "question": "What was the primary architectural motivation for rewriting React's core reconciliation algorithm with React Fiber?",
+    "options": [
+      "A) To switch from JavaScript to TypeScript",
+      "B) To break the synchronous, un-interruptible recursive stack reconciler into incremental, interruptible units of work (fibers) that can be prioritized, paused, resumed, or aborted based on deadline schedules",
+      "C) To eliminate the browser DOM completely",
+      "D) To add built-in Redux support"
+    ],
+    "answer": "B",
+    "explanation": "The legacy stack reconciler executed reconciliation synchronously in one deep recursive call, blocking the main thread during heavy updates. Fiber represents each element as a linked-list work node, enabling time-slicing and prioritization of urgent tasks (like user input) over background tasks."
+  },
+  {
+    "id": "sr-react-02",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Fiber Phases: Render vs Commit",
+    "question": "In React Fiber's two-phase processing, which phase is pure/interruptible and which phase is synchronous/side-effectful?",
+    "options": [
+      "A) Render phase is synchronous; Commit phase is interruptible",
+      "B) Render phase is asynchronous and can be paused/restarted without DOM mutation; Commit phase is synchronous and applies DOM mutations and invokes lifecycle effects",
+      "C) Both phases run concurrently in background Web Workers",
+      "D) Commit phase only runs on the Node.js server"
+    ],
+    "answer": "B",
+    "explanation": "The Render/Reconciliation phase builds the workInProgress fiber tree and is purely computational (it can be paused, restarted, or thrown away). The Commit phase is strictly synchronous, applying DOM updates and invoking layout effects to prevent visible visual tearing."
+  },
+  {
+    "id": "sr-react-03",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "useTransition Hook",
+    "question": "How does the `useTransition` hook prevent UI freezing during expensive state transitions in React 18+?",
+    "options": [
+      "A) It spawns a background Node.js worker process",
+      "B) It marks the state update as a non-urgent transition, allowing urgent user interactions (typing, clicking) to interrupt the render and keeping the UI responsive while providing an `isPending` flag",
+      "C) It caches all component renders in localStorage",
+      "D) It converts the component tree into an SVG canvas"
+    ],
+    "answer": "B",
+    "explanation": "`startTransition(() => setState(...))` deprioritizes the state update. React renders the heavy work in the background without blocking high-priority user inputs, yielding to user events before finishing the transition."
+  },
+  {
+    "id": "sr-react-04",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "useSyncExternalStore",
+    "question": "Why was `useSyncExternalStore` introduced in React 18 for subscribing to non-React external stores (e.g. Redux, Zustand, browser APIs)?",
+    "options": [
+      "A) To replace all fetch calls",
+      "B) To prevent 'tearing' (visual inconsistency where different components render data from different snapshots of the external store during concurrent rendering) by enforcing synchronous store reads",
+      "C) To synchronize React state with PostgreSQL directly",
+      "D) To store component state in Service Workers"
+    ],
+    "answer": "B",
+    "explanation": "In concurrent React, rendering can yield. If an external mutable store updates midway through a render, some components might read the old value and others the new value ('tearing'). `useSyncExternalStore` guarantees consistent, tear-free reads."
+  },
+  {
+    "id": "sr-react-05",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React Server Components (RSC) vs SSR",
+    "question": "What is the fundamental distinction between React Server Components (RSC) and traditional Server-Side Rendering (SSR)?",
+    "options": [
+      "A) RSC compiles components to WebAssembly, while SSR compiles to HTML",
+      "B) SSR pre-renders HTML on the server but still ships all component JavaScript to the client for hydration; RSC execute exclusively on the server, ship zero JavaScript to the client bundle, and stream rendered UI in a compact serialized protocol",
+      "C) RSC only works with MongoDB, whereas SSR only works with PostgreSQL",
+      "D) SSR is deprecated and replaced entirely by RSC"
+    ],
+    "answer": "B",
+    "explanation": "Traditional SSR sends HTML for initial paint, but the client must still download, parse, and execute all component JS to hydrate event handlers. RSC components execute ONLY on the server: their dependencies (e.g., massive markdown parsers or DB drivers) never enter the client JavaScript bundle."
+  },
+  {
+    "id": "sr-react-06",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Selective Hydration with Suspense",
+    "question": "How does Selective Hydration work with React 18's streaming SSR architecture (`renderToPipeableStream`)?",
+    "options": [
+      "A) It only hydrates components on desktop computers",
+      "B) React streams HTML chunks wrapped in `<Suspense>`, and begins hydrating loaded parts of the page independently before the entire HTML document finishes downloading; if the user clicks an unhydrated component, React prioritizes hydrating that specific subtree first",
+      "C) It eliminates all JavaScript from the client",
+      "D) It hydrates via WebSockets exclusively"
+    ],
+    "answer": "B",
+    "explanation": "Selective Hydration breaks the monolithic 'all-or-nothing' hydration model. Slow backend data subtrees wrapped in `<Suspense>` stream in later, while already-rendered components become interactive immediately. Early user interactions prioritize the hydration of the clicked component."
+  },
+  {
+    "id": "sr-react-07",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "useDeferredValue Internals",
+    "question": "What is the difference between debouncing an input state and using `useDeferredValue` in React?",
+    "options": [
+      "A) Debouncing introduces a fixed artificial time delay (e.g. 300ms) regardless of machine speed, whereas `useDeferredValue` defers rendering dynamically until the main thread is idle, rendering instantly on fast machines without artificial latency",
+      "B) `useDeferredValue` only works on numbers",
+      "C) Debouncing does not work in React 18",
+      "D) `useDeferredValue` prevents re-renders entirely"
+    ],
+    "answer": "A",
+    "explanation": "Debouncing always delays execution by N milliseconds. `useDeferredValue` is integrated into React's concurrent scheduler: on powerful machines, it renders immediately; on slower devices, it defers rendering behind user input without lag."
+  },
+  {
+    "id": "sr-react-08",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Hydration Mismatch Errors",
+    "question": "What triggers a React Hydration Mismatch error, and what are its performance and architectural consequences?",
+    "options": [
+      "A) A syntax error in CSS",
+      "B) When the server-rendered HTML tree differs from the initial client-rendered Virtual DOM tree (e.g. using `window.innerWidth`, `Date.now()`, or `Math.random()` during render), forcing React to discard server DOM and perform expensive client-side re-rendering",
+      "C) A mismatch between Node.js and React versions",
+      "D) Missing database foreign keys"
+    ],
+    "answer": "B",
+    "explanation": "If server HTML does not match client initial render, React flags a hydration mismatch. React must throw away the mismatched DOM nodes and reconstruct them on the client, degrading initial load performance and causing visual flickering."
+  },
+  {
+    "id": "sr-react-09",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React Compiler (Forget)",
+    "question": "What is the primary role of the React Compiler (React Forget)?",
+    "options": [
+      "A) It automatically deletes unused state variables",
+      "B) An optimizing compiler that analyzes JavaScript rules and auto-memoizes component values and callbacks, eliminating the need for manual `useMemo`, `useCallback`, and `React.memo` boilerplate",
+      "C) It deletes stale cookies on logout",
+      "D) It converts React into Svelte"
+    ],
+    "answer": "B",
+    "explanation": "The React Compiler performs static analysis of component code adhering to the Rules of React, automatically injecting fine-grained memoization so developers no longer need to manually manage dependency arrays and `useMemo`/`useCallback`."
+  },
+  {
+    "id": "sr-react-10",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Profiling Production Builds",
+    "question": "Why does React DevTools Profiler require building with `--profile` flag in production environments?",
+    "options": [
+      "A) Profiling is illegal in production without a license",
+      "B) Standard production React builds strip profiling hooks and commit timestamps to maximize bundle minification and runtime execution speed",
+      "C) Production builds only run in bytecode",
+      "D) To prevent hackers from viewing source maps"
+    ],
+    "answer": "B",
+    "explanation": "Standard production builds remove measurement instrumentation to achieve optimal performance. The `--profile` bundle flag retains lightweight profiler markers (`react-dom/profiling`) while keeping production minification."
+  },
+  {
+    "id": "sr-react-11",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Micro-Frontend Module Federation",
+    "question": "How does Webpack / Vite Module Federation facilitate scaling large enterprise PERN/MERN frontends?",
+    "options": [
+      "A) It embeds iframes for every page component",
+      "B) It allows multiple independently deployed React applications to dynamically share code, vendor libraries (like React and React-DOM as singletons), and remote components at runtime without full monolithic rebuilds",
+      "C) It bundles all frontend code into a single 50MB file",
+      "D) It converts React to Web Components"
+    ],
+    "answer": "B",
+    "explanation": "Module Federation enables decentralized micro-frontends: independent teams build and deploy discrete React applications that dynamically consume remote components at runtime while sharing common singleton dependencies to avoid duplicate library downloads."
+  },
+  {
+    "id": "sr-react-12",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Custom State Machine Patterns (XState)",
+    "question": "Why are Finite State Machines (FSMs) or statecharts (like XState) superior to boolean flag soups (`isLoading`, `isError`, `isSuccess`) for complex UI flows?",
+    "options": [
+      "A) Booleans are not supported in TypeScript",
+      "B) Multiple boolean flags permit impossible or contradictory states (e.g. `isLoading: true && isSuccess: true`), whereas FSMs mathematically guarantee that the system can only occupy exactly one valid finite state at any given time with explicit transitions",
+      "C) State machines compile directly into C++",
+      "D) State machines eliminate network latency"
+    ],
+    "answer": "B",
+    "explanation": "With 4 boolean flags, there are 2^4 = 16 possible states, most of which are invalid. An FSM mathematically models explicitly allowed states and transitions, preventing bugs like showing a spinner and a success modal simultaneously."
+  },
+  {
+    "id": "sr-react-13",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "React Fiber Internals & Work Loop",
+    "question": "Explain how React Fiber represents the component tree using a linked-list structure (`child`, `sibling`, `return`). How does the cooperative scheduling work loop (`workLoopConcurrent`) yield execution to the browser?",
+    "expectedKeyPoints": [
+      "Fibers are JavaScript objects representing units of work; each fiber has child, sibling, and return pointers",
+      "workLoopConcurrent checks shouldYield() (via Scheduler / MessageChannel)",
+      "If time slice expires (typically 5ms), it pauses the work loop, yields to browser for paint/input, and resumes on next micro/macro task",
+      "Reconciliation produces an effect list/flags committed in the synchronous commit phase"
+    ],
+    "sampleAnswer": "1. Fiber Linked List Architecture:\nUnlike the legacy call stack reconciler, each React element maps to a Fiber node. Relationships are maintained via three pointers:\n- `child`: Points to the first direct child component.\n- `sibling`: Points to the next sibling component.\n- `return`: Points to the parent fiber node to return to after completing a branch.\nThis linked list allows traversing the entire tree iteratively with a `while` loop rather than recursion.\n2. Work Loop & Cooperative Scheduling:\nIn concurrent mode, React executes `workLoopConcurrent()`:\n```javascript\nfunction workLoopConcurrent() {\n  while (workInProgress !== null && !shouldYield()) {\n    performUnitOfWork(workInProgress);\n  }\n}\n```\n`shouldYield()` queries the React Scheduler (using `MessageChannel` / `performance.now()`). When the ~5ms time slice budget is exhausted, React pauses reconciliation, yields the main thread to the browser to handle user keystrokes and CSS layout reflows, and resumes where it left off."
+  },
+  {
+    "id": "sr-react-14",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "React Server Components Architecture",
+    "question": "Explain the architecture of React Server Components (RSC). How do RSCs communicate with Client Components across the serialization boundary, and what are the strict rules regarding what data can cross this boundary?",
+    "expectedKeyPoints": [
+      "Server Components execute only on the server, can directly query databases (PostgreSQL/MongoDB) or file systems",
+      "Client Components are marked with 'use client' directive",
+      "Serialization boundary: Props passed from Server to Client Components must be serializable (JSON, Promises, JSX elements, typed arrays; no functions, class instances, or symbols)",
+      "RSC stream an intermediate serialized protocol (RSC payload) that the client reconciler merges into the Virtual DOM"
+    ],
+    "sampleAnswer": "1. Execution Architecture:\nServer Components execute exclusively on the server. They have direct access to backend resources (PostgreSQL pools, MongoDB models, filesystem, internal microservices) with zero client bundle overhead.\n2. The 'use client' Boundary:\n`'use client'` marks the boundary where server code ends and client-interactive code begins. It is an export boundary, not a directive that the component only runs on the client (client components still pre-render on the server during SSR).\n3. Serialization Rules:\nProps passed across the boundary from a Server Component to a Client Component must be serializable into the RSC wire protocol:\n- Allowed: Primitives (strings, numbers, booleans), plain objects, arrays, Promises, React elements (JSX), BigInt, TypedArrays.\n- Forbidden: Functions (event handlers like `onClick`), class instances, symbols, and non-serializable objects.\n4. RSC Wire Protocol:\nThe server streams a compact JSON-like stream of fiber nodes. The client reconciler receives these chunks and patches them into the existing DOM tree without destroying local client state."
+  },
+  {
+    "id": "sr-react-15",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "Designing an Enterprise State Architecture",
+    "question": "Design an enterprise state architecture for a high-traffic PERN/MERN dashboard application. Categorize state into Server State, Global Client State, URL State, and Local UI State, citing specific libraries and best practices for each.",
+    "expectedKeyPoints": [
+      "Server State: TanStack Query (React Query) for caching, invalidation, deduplication, optimistic updates",
+      "Global Client State: Zustand for lightweight, selector-based atomic state (theme, notifications, auth session)",
+      "URL State: nuqs / React Router searchParams for filters, sorting, pagination (shareable deep links)",
+      "Local UI State: useState/useReducer for transient form inputs, modal toggles, dropdowns",
+      "Avoid monolithic global stores holding server data"
+    ],
+    "sampleAnswer": "1. Server State (Data from API/DB):\n- Tool: TanStack Query (React Query) or RTK Query.\n- Rationale: Manages asynchronous caching, background revalidation, query deduplication, optimistic mutations, and garbage collection. Never store raw API response arrays in a manual global store.\n2. URL State (Single Source of Truth for Navigation):\n- Tool: React Router / `nuqs` (search parameters).\n- Rationale: Filters, search terms, active tabs, and pagination offsets belong in query strings (`?tab=analytics&page=2`). This guarantees shareable URLs, bookmarking, and native browser back/forward navigation.\n3. Global Client State (Application-Wide UI State):\n- Tool: Zustand.\n- Rationale: Manages client-only singleton state (e.g. sidebar collapse state, active modals, user preferences). Selector subscriptions prevent unnecessary component re-renders.\n4. Local Component State:\n- Tool: `useState` / `useReducer`.\n- Rationale: Strictly transient UI interactions (accordion toggle, hover state, temporary form validation errors)."
+  },
+  {
+    "id": "sr-react-16",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "Architecting a Resilient Design System with Compound Components",
+    "question": "Write a production-grade, accessible Compound Component for a Modal Dialog in React using Context, Refs, and Portals that manages focus trapping, Escape key handling, and outside clicks.",
+    "expectedKeyPoints": [
+      "Modal root managing open state and accessibility attributes",
+      "Modal.Trigger, Modal.Content, Modal.Close subcomponents",
+      "ReactDOM.createPortal to render into document.body",
+      "useEffect listening for 'Escape' key and trapping tab focus",
+      "Proper ARIA roles (role='dialog', aria-modal='true', aria-labelledby)"
+    ],
+    "sampleAnswer": "```javascript\nimport React, { createContext, useContext, useState, useEffect, useRef } from 'react';\nimport ReactDOM from 'react-dom';\n\nconst ModalContext = createContext(null);\n\nexport function Modal({ children, isOpen: controlledOpen, onClose }) {\n  const [internalOpen, setInternalOpen] = useState(false);\n  const isControlled = controlledOpen !== undefined;\n  const isOpen = isControlled ? controlledOpen : internalOpen;\n\n  const handleClose = () => {\n    if (onClose) onClose();\n    if (!isControlled) setInternalOpen(false);\n  };\n\n  return (\n    <ModalContext.Provider value={{ isOpen, handleClose, openModal: () => setInternalOpen(true) }}>\n      {children}\n    </ModalContext.Provider>\n  );\n}\n\nModal.Trigger = function ModalTrigger({ children }) {\n  const { openModal } = useContext(ModalContext);\n  return React.cloneElement(children, { onClick: openModal });\n};\n\nModal.Content = function ModalContent({ children, title }) {\n  const { isOpen, handleClose } = useContext(ModalContext);\n  const dialogRef = useRef(null);\n\n  useEffect(() => {\n    if (!isOpen) return;\n    const handleKeyDown = (e) => {\n      if (e.key === 'Escape') handleClose();\n    };\n    document.addEventListener('keydown', handleKeyDown);\n    return () => document.removeEventListener('keydown', handleKeyDown);\n  }, [isOpen]);\n\n  if (!isOpen) return null;\n\n  return ReactDOM.createPortal(\n    <div className='modal-backdrop' onClick={handleClose}>\n      <div\n        className='modal-card'\n        role='dialog'\n        aria-modal='true'\n        ref={dialogRef}\n        onClick={(e) => e.stopPropagation()}\n      >\n        {title && <h2>{title}</h2>}\n        {children}\n        <button onClick={handleClose} aria-label='Close'>\u00d7</button>\n      </div>\n    </div>,\n    document.body\n  );\n};\n```"
+  },
+  {
+    "id": "sr-node-01",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "V8 Memory Spaces",
+    "question": "In V8's garbage collection architecture, how does the Scavenge (Young Generation) algorithm differ from the Mark-Sweep-Compact (Old Generation) algorithm?",
+    "options": [
+      "A) Scavenge is for files; Mark-Sweep is for network buffers",
+      "B) Scavenge splits the Semi-Space into 'From' and 'To' spaces and copies surviving objects quickly (Cheney's algorithm), while Mark-Sweep-Compact pauses to mark live objects, sweeps dead ones, and compacts fragmented memory for long-lived objects",
+      "C) Scavenge is executed by the OS kernel, not V8",
+      "D) Mark-Sweep only runs when Node.js terminates"
+    ],
+    "answer": "B",
+    "explanation": "V8's Young Generation uses a fast generational copy collector (Scavenge) between two semi-spaces. Most objects die young. Objects that survive multiple scavenge cycles are promoted to Old Space, which is cleaned by the more expensive Mark-Sweep-Compact collector."
+  },
+  {
+    "id": "sr-node-02",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Event Loop Starvation by ReDoS",
+    "question": "How does a Regular Expression Denial of Service (ReDoS) freeze a high-throughput Node.js microservice?",
+    "options": [
+      "A) It deletes the regex engine from disk",
+      "B) Vulnerable non-deterministic finite automaton (NFA) regex patterns with nested quantifiers (e.g. `(a+)+$`) trigger catastrophic backtracking with exponential time complexity (O(2^N)), monopolizing the single JavaScript thread and blocking all other HTTP requests",
+      "C) It exhausts PostgreSQL connections",
+      "D) It crashes the Linux network card"
+    ],
+    "answer": "B",
+    "explanation": "Because Node executes JavaScript on a single thread, an exponential backtracking regex evaluated against a malicious string stalls the CPU at 100%, causing event loop starvation where no timers, I/O, or HTTP requests can be processed."
+  },
+  {
+    "id": "sr-node-03",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "AsyncLocalStorage Context Propagation",
+    "question": "What is the primary use case of `AsyncLocalStorage` from the `async_hooks` module in enterprise Node.js services?",
+    "options": [
+      "A) Storing cookies on the client browser",
+      "B) Propagating request-scoped context (such as correlation IDs, transaction traces, or authenticated user identity) across asynchronous execution chains without explicitly passing variables through every function argument",
+      "C) Caching SQL queries in RAM",
+      "D) Replacing Redis in production"
+    ],
+    "answer": "B",
+    "explanation": "`AsyncLocalStorage` provides continuation-local storage across asynchronous Promise chains and callbacks, enabling distributed tracing, request correlation IDs, and tenant isolation without polluting function signatures."
+  },
+  {
+    "id": "sr-node-04",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Worker Threads SharedArrayBuffer & Atomics",
+    "question": "How do Node.js Worker Threads achieve ultra-fast inter-thread communication without the overhead of structured cloning serialization?",
+    "options": [
+      "A) By writing to shared JSON files on an NVMe SSD",
+      "B) By sharing the same physical memory buffer using `SharedArrayBuffer` and synchronizing concurrent read/write operations safely using `Atomics` operations",
+      "C) By streaming data over local loopback TCP sockets",
+      "D) By using Redis in-memory pub/sub"
+    ],
+    "answer": "B",
+    "explanation": "Standard `postMessage` serializes data using the structured clone algorithm. `SharedArrayBuffer` maps the exact same memory bytes to multiple threads, and `Atomics` (e.g. `Atomics.wait`, `Atomics.notify`) provides atomic lock-free coordination."
+  },
+  {
+    "id": "sr-node-05",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Libuv Threadpool Starvation",
+    "question": "If an Express application concurrently executes 20 heavy `crypto.pbkdf2` password hashes while using default settings, what happens to incoming `fs.readFile` calls?",
+    "options": [
+      "A) `fs.readFile` runs in parallel without any delay because it uses an independent thread pool",
+      "B) `fs.readFile` is queued and delayed because default libuv has only 4 worker threads (`UV_THREADPOOL_SIZE=4`), and all 4 are saturated by the synchronous crypto operations",
+      "C) Node.js automatically spawns 100 operating system threads",
+      "D) The operating system terminates the Node.js process"
+    ],
+    "answer": "B",
+    "explanation": "Both `fs` operations and certain `crypto` functions share the same default 4-thread libuv pool. Saturating all 4 threads causes threadpool starvation, stalling unrelated file I/O operations until threads free up."
+  },
+  {
+    "id": "sr-node-06",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Clinic.js Diagnostics",
+    "question": "In the Node.js diagnostic tool suite Clinic.js, which tool is specifically designed to isolate event loop latency and thread pool contention?",
+    "options": [
+      "A) Clinic Doctor",
+      "B) Clinic Flame",
+      "C) Clinic Bubbleprof",
+      "D) Clinic Clean"
+    ],
+    "answer": "C",
+    "explanation": "Clinic Bubbleprof profiles async latency between operations, mapping delays across async hops to identify whether bottlenecks stem from database latency, event loop delays, or thread pool starvation."
+  },
+  {
+    "id": "sr-node-07",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Node-API (N-API) Stability",
+    "question": "What is the core benefit of writing native C/C++ addons using Node-API (formerly N-API) instead of older V8 APIs?",
+    "options": [
+      "A) Node-API compiles directly into JavaScript",
+      "B) Node-API provides an Application Binary Interface (ABI) stability guarantee, meaning compiled native addons do not need to be recompiled when upgrading Node.js major versions",
+      "C) Node-API eliminates C++ compiler warnings",
+      "D) Node-API requires no C++ knowledge"
+    ],
+    "answer": "B",
+    "explanation": "Before Node-API, upgrading Node.js major versions broke native addons because V8 internal APIs shifted. Node-API abstracts V8, guaranteeing ABI compatibility across major Node versions."
+  },
+  {
+    "id": "sr-node-08",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "V8 Heap Snapshots Retained Size",
+    "question": "When inspecting a Node.js heap snapshot in Chrome DevTools, what is the critical difference between 'Shallow Size' and 'Retained Size'?",
+    "options": [
+      "A) Shallow size is RAM; Retained size is disk space",
+      "B) Shallow size is the memory held by the object itself; Retained size is the total memory freed if that object is garbage collected (including all dependent objects it keeps alive)",
+      "C) Retained size is always smaller than shallow size",
+      "D) Shallow size includes V8 engine code"
+    ],
+    "answer": "B",
+    "explanation": "An object holding a reference to a 100MB buffer has a tiny shallow size (just the pointer bytes), but its retained size is over 100MB because it prevents the buffer from being collected."
+  },
+  {
+    "id": "sr-node-09",
+    "level": "senior",
+    "stack": "node",
+    "type": "open",
+    "topic": "V8 Garbage Collection Tuning and Heap Forensics",
+    "question": "Explain the mechanics of V8's Generational Garbage Collector (Scavenger vs Mark-Sweep-Compact). What flags and diagnostic steps do you use to diagnose and fix a production Out-Of-Memory (OOM) crash in Node.js?",
+    "expectedKeyPoints": [
+      "Generational hypothesis: most objects die young (New Space: Eden/To/From)",
+      "Long-lived objects promoted to Old Space; collected by Mark-Sweep-Compact with incremental marking to reduce stop-the-world pauses",
+      "Flags: --max-old-space-size, --trace-gc, --heapsnapshot-on-unhandled-exception / --heapsnapshot-on-signal",
+      "Forensics: Inspect Retaining Tree in Chrome DevTools, find root dominator leaking memory"
+    ],
+    "sampleAnswer": "1. Generational GC Mechanics:\n- New Space (Young Gen): Divided into two Semi-Spaces (From/To). Allocations land in From space. A fast Scavenge cycle copies surviving objects to the To space and swaps pointers. Surviving two cycles promotes the object to Old Space.\n- Old Space: Contains long-lived data. V8 uses Mark-Sweep-Compact. It employs Incremental Marking and Concurrent Sweeping to interleave GC pauses with JavaScript execution, minimizing 'Stop-the-World' latency.\n2. Diagnosing Production OOM:\n- Enable Flags: Run with `--max-old-space-size=4096` and `--heapsnapshot-on-unhandled-exception` or capture snapshots on `SIGUSR2`.\n- Analyze GC Activity: Use `--trace-gc` or `--trace-gc-verbose` to log pause times and heap growth patterns.\n- Inspect Snapshots: Load the snapshot in Chrome DevTools. Look at the 'Dominators' and 'Summary' views. Sort by 'Retained Size'. Trace the Retaining Path back to GC roots (usually global arrays, unresolved promise closures, or event listener maps)."
+  },
+  {
+    "id": "sr-node-10",
+    "level": "senior",
+    "stack": "node",
+    "type": "open",
+    "topic": "Distributed Tracing with AsyncLocalStorage",
+    "question": "Implement an enterprise Express middleware using `AsyncLocalStorage` that generates or propagates a W3C `traceparent` distributed tracing ID and makes it accessible across all database and service calls without parameter drilling.",
+    "expectedKeyPoints": [
+      "Import AsyncLocalStorage from node:async_hooks",
+      "Middleware extracts req.headers['traceparent'] or generates crypto.randomUUID()",
+      "Calls asyncLocalStorage.run(context, () => next())",
+      "Logging and database query wrappers retrieve traceId via asyncLocalStorage.getStore()"
+    ],
+    "sampleAnswer": "```javascript\nimport { AsyncLocalStorage } from 'node:async_hooks';\nimport crypto from 'node:crypto';\n\nexport const tracer = new AsyncLocalStorage();\n\nexport function traceMiddleware(req, res, next) {\n  const traceId = req.headers['x-trace-id'] || crypto.randomUUID();\n  const store = {\n    traceId,\n    startTime: Date.now(),\n    user: null\n  };\n\n  res.setHeader('X-Trace-Id', traceId);\n  tracer.run(store, () => {\n    next();\n  });\n}\n\n// Usage anywhere in deep business logic or DB models:\nexport function logWithContext(message) {\n  const store = tracer.getStore();\n  const traceId = store ? store.traceId : 'no-trace';\n  console.log(`[${new Date().toISOString()}] [${traceId}] ${message}`);\n}\n```"
+  },
+  {
+    "id": "sr-express-01",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Distributed Rate Limiting with Redis Lua",
+    "question": "Why must multi-instance Express microservices execute distributed rate limiting via Redis Lua scripts rather than separate Redis GET and INCR commands?",
+    "options": [
+      "A) Lua scripts compile to C++",
+      "B) Executing separate GET, INCR, and EXPIRE commands introduces race conditions between concurrent requests; Redis Lua scripts execute atomically in a single thread, guaranteeing thread-safe counter checks without distributed locks",
+      "C) Lua scripts bypass Redis memory limits",
+      "D) Express cannot run Redis commands directly"
+    ],
+    "answer": "B",
+    "explanation": "In a distributed cluster, separate `GET` and `INCR` commands suffer from race conditions. Redis guarantees that Lua scripts execute atomically, preventing two simultaneous requests from bypassing rate caps."
+  },
+  {
+    "id": "sr-express-02",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Circuit Breaker Pattern (Opossum)",
+    "question": "In a microservices architecture, what is the role of the 'Half-Open' state in a Circuit Breaker (e.g. Opossum)?",
+    "options": [
+      "A) The circuit is permanently broken and all traffic is dropped",
+      "B) After a timeout period following an open failure state, the circuit allows a limited number of trial requests through to test if the downstream service has recovered, closing if successful or re-opening if failures persist",
+      "C) The circuit only accepts GET requests",
+      "D) It cuts CPU clock speed in half"
+    ],
+    "answer": "B",
+    "explanation": "A Circuit Breaker moves from Closed (healthy) to Open (failing, fast-failing calls). In the Half-Open state, it sends probe requests to test downstream health; if they succeed, it closes the circuit and resumes normal operations."
+  },
+  {
+    "id": "sr-express-03",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Handling Backpressure on Large Streaming Uploads",
+    "question": "What catastrophe occurs if an Express server reads an incoming multipart video stream and pipes it into an AWS S3 stream without respecting backpressure (`stream.pipeline` / `write()` returning false)?",
+    "options": [
+      "A) The video resolution is downgraded to 144p",
+      "B) Data chunks buffer indefinitely in Node.js heap memory because the network read rate exceeds the upload rate, eventually triggering a fatal V8 JavaScript heap out-of-memory crash",
+      "C) S3 rejects the connection",
+      "D) The operating system deletes the file"
+    ],
+    "answer": "B",
+    "explanation": "If write speed is slower than read speed, unconsumed chunks accumulate in Node's internal buffer queue. Without backpressure pausing the readable source, memory balloons until the Node process crashes with OOM."
+  },
+  {
+    "id": "sr-express-04",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "gRPC vs REST for Inter-Service Calls",
+    "question": "Why do high-throughput internal microservices often communicate via gRPC (Protobuf over HTTP/2) instead of JSON REST APIs?",
+    "options": [
+      "A) gRPC requires no code compilation",
+      "B) Protobuf provides binary serialization (smaller payloads and faster parsing than JSON text), multiplexed bidirectional streaming over a single TCP connection via HTTP/2, and strict compile-time contract enforcement",
+      "C) gRPC can only be written in Go",
+      "D) REST APIs do not support HTTPS"
+    ],
+    "answer": "B",
+    "explanation": "gRPC delivers 5x-10x higher throughput than REST by eliminating verbose JSON strings, leveraging binary Protocol Buffers, and reusing persistent HTTP/2 connections with header compression (HPACK)."
+  },
+  {
+    "id": "sr-express-05",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Reverse Proxy Load Balancing Algorithms",
+    "question": "When load-balancing traffic across 10 Express backend pods, why is 'Least Connections' generally superior to simple 'Round Robin' for heterogeneous workloads?",
+    "options": [
+      "A) Round Robin is deprecated in Nginx",
+      "B) Requests have variable execution times (e.g. quick cache hits vs heavy PDF generation); Least Connections routes traffic to pods with the fewest active requests, preventing slow requests from accumulating on a single overloaded worker",
+      "C) Least Connections encrypts HTTP headers",
+      "D) Round Robin requires sticky cookies"
+    ],
+    "answer": "B",
+    "explanation": "Round Robin blindly alternates pods regardless of workload. If Pod 1 receives three heavy reporting queries, it becomes saturated. Least Connections routes traffic dynamically to the worker with the lowest active concurrent load."
+  },
+  {
+    "id": "sr-express-06",
+    "level": "senior",
+    "stack": "express",
+    "type": "open",
+    "topic": "Distributed Rate Limiter with Redis Token Bucket",
+    "question": "Write a production-ready Express rate limiting middleware using an atomic Redis Lua script implementing the Token Bucket algorithm with refill rate and maximum burst capacity.",
+    "expectedKeyPoints": [
+      "Evaluates token bucket atomically in Redis using EVAL / Lua script",
+      "Calculates tokens to add based on (now - lastRefillTime) * refillRate",
+      "Deducts token if available and updates lastRefillTime; returns remaining tokens or reject with 429",
+      "Includes standard headers (X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After)"
+    ],
+    "sampleAnswer": "```javascript\nconst tokenBucketLua = `\n  local key = KEYS[1]\n  local capacity = tonumber(ARGV[1])\n  local refillRate = tonumber(ARGV[2]) -- tokens per millisecond\n  local now = tonumber(ARGV[3])\n  local requested = tonumber(ARGV[4])\n\n  local data = redis.call('HMGET', key, 'tokens', 'lastRefill')\n  local tokens = tonumber(data[1])\n  local lastRefill = tonumber(data[2])\n\n  if not tokens then\n    tokens = capacity\n    lastRefill = now\n  else\n    local elapsed = now - lastRefill\n    tokens = math.min(capacity, tokens + (elapsed * refillRate))\n    lastRefill = now\n  end\n\n  if tokens >= requested then\n    tokens = tokens - requested\n    redis.call('HMSET', key, 'tokens', tokens, 'lastRefill', lastRefill)\n    redis.call('PEXPIRE', key, 3600000) -- 1 hr TTL\n    return { 1, math.floor(tokens) }\n  else\n    redis.call('HMSET', key, 'tokens', tokens, 'lastRefill', lastRefill)\n    return { 0, math.floor(tokens) }\n  end\n`;\n\nexport const tokenBucketLimiter = (redisClient, capacity = 100, refillPerSec = 10) => {\n  const refillRate = refillPerSec / 1000;\n  return async (req, res, next) => {\n    const key = `rate_limit:${req.ip}`;\n    const now = Date.now();\n    const [allowed, remaining] = await redisClient.eval(\n      tokenBucketLua, 1, key, capacity, refillRate, now, 1\n    );\n    res.setHeader('X-RateLimit-Remaining', remaining);\n    if (allowed === 1) return next();\n    res.setHeader('Retry-After', Math.ceil(1 / refillPerSec));\n    return res.status(429).json({ error: 'Too Many Requests (Token Bucket Exhausted)' });\n  };\n};\n```"
+  },
+  {
+    "id": "sr-express-07",
+    "level": "senior",
+    "stack": "express",
+    "type": "open",
+    "topic": "Circuit Breaker Implementation for External APIs",
+    "question": "Explain the three states of the Circuit Breaker pattern (Closed, Open, Half-Open). Write a production implementation or wrapper using `opossum` protecting an Express controller from third-party payment gateway outages.",
+    "expectedKeyPoints": [
+      "Closed: Normal operation, routing requests downstream",
+      "Open: Error threshold exceeded (e.g. 50% failures), immediately fast-fails calls without invoking downstream",
+      "Half-Open: Cooldown expires (resetTimeout), allows test requests to gauge health",
+      "Opossum configuration with timeout, errorThresholdPercentage, resetTimeout, fallback response"
+    ],
+    "sampleAnswer": "```javascript\nimport CircuitBreaker from 'opossum';\n\nasync function callPaymentGateway(paymentData) {\n  const response = await fetch('https://api.payment-gateway.com/charge', {\n    method: 'POST',\n    body: JSON.stringify(paymentData),\n    signal: AbortSignal.timeout(3000) // 3s network timeout\n  });\n  if (!response.ok) throw new Error(`Gateway Error: ${response.status}`);\n  return response.json();\n}\n\nconst options = {\n  timeout: 3000, // Trigger failure if call takes > 3s\n  errorThresholdPercentage: 50, // Open circuit if 50% fail\n  resetTimeout: 15000 // Try again after 15s (Half-Open)\n};\n\nexport const paymentBreaker = new CircuitBreaker(callPaymentGateway, options);\n\npaymentBreaker.fallback(() => ({\n  status: 'queued',\n  message: 'Payment service currently experiencing high latency. Your request is queued for processing.'\n}));\n\npaymentBreaker.on('open', () => console.warn('\u26a0\ufe0f Circuit Breaker OPEN: Payment gateway offline!'));\npaymentBreaker.on('halfOpen', () => console.log('\u26a1 Circuit Breaker HALF-OPEN: Testing gateway...'));\npaymentBreaker.on('close', () => console.log('\u2705 Circuit Breaker CLOSED: Gateway healthy.'));\n```"
+  },
+  {
+    "id": "sr-mongo-01",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Sharding & Shard Key Selection",
+    "question": "What is the catastrophic consequence of choosing a monotonically increasing shard key (like `ObjectId` or `timestamp`) in a high-write MongoDB sharded cluster?",
+    "options": [
+      "A) All documents are deleted after 24 hours",
+      "B) 'Hotspotting' occurs: all new inserts target the single maximum shard chunk range, directing 100% of write traffic to a single shard while other shards sit idle, destroying horizontal write scaling",
+      "C) Sharded clusters cannot accept timestamps",
+      "D) The database switches to read-only mode"
+    ],
+    "answer": "B",
+    "explanation": "Monotonically increasing keys always fall into the upper bound chunk on the last shard. All write throughput hammers a single machine, negating the entire purpose of horizontal sharding. Hashed shard keys or compound keys avoid hotspotting."
+  },
+  {
+    "id": "sr-mongo-02",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "WiredTiger Checkpoints & Cache Eviction",
+    "question": "How does MongoDB's WiredTiger storage engine manage cache eviction and durability under heavy memory pressure?",
+    "options": [
+      "A) It writes every single update directly to unbuffered raw disk sectors",
+      "B) WiredTiger maintains a clean and dirty cache. When dirty cache exceeds thresholds (default 20%), background threads aggressively evict pages to disk. Every 60 seconds (or 2GB of logs), it creates a durable checkpoint across data files",
+      "C) It drops old collections automatically",
+      "D) It restarts the mongod process"
+    ],
+    "answer": "B",
+    "explanation": "WiredTiger uses an in-memory cache (typically 50% of RAM minus 1GB). Modifications mark cache pages as 'dirty'. Periodic checkpoints write a consistent snapshot to disk every 60s, relying on the Write-Ahead Log (journal) for recovery between checkpoints."
+  },
+  {
+    "id": "sr-mongo-03",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Read Concern Linearizable vs Majority",
+    "question": "What is the difference between Read Concern `majority` and `linearizable` in MongoDB?",
+    "options": [
+      "A) `majority` reads from all nodes; `linearizable` reads from secondary nodes",
+      "B) `majority` returns data acknowledged by a majority of replica set members (immune to rollback), while `linearizable` additionally performs real-time consensus with peers to guarantee the primary has not been deposed by a network partition, preventing stale reads during split-brain elections",
+      "C) `linearizable` is 10x faster than `majority`",
+      "D) There is no difference"
+    ],
+    "answer": "B",
+    "explanation": "In a network partition, an isolated primary might not realize it has been superseded. `readConcern: majority` could read data before the old primary discovers it was replaced. `linearizable` forces the primary to confirm its leadership with peers before returning, guaranteeing strict real-time serializability."
+  },
+  {
+    "id": "sr-mongo-04",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Jumbo Chunks in Sharding",
+    "question": "What is a 'Jumbo Chunk' in MongoDB sharding, and how does it occur?",
+    "options": [
+      "A) A chunk stored on an AWS jumbo instance",
+      "B) A chunk that exceeds the maximum chunk size (default 64MB) and cannot be split because all documents in the chunk share the exact same low-cardinality shard key value",
+      "C) A chunk containing video files",
+      "D) A compressed database file"
+    ],
+    "answer": "B",
+    "explanation": "When a shard key has low cardinality (e.g. `country: 'US'`), millions of documents share the identical key value. MongoDB cannot split documents with identical keys across chunks, creating an indivisible 'Jumbo Chunk' that the balancer cannot migrate."
+  },
+  {
+    "id": "sr-mongo-05",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Covered Queries in MongoDB",
+    "question": "What conditions must be satisfied for a MongoDB query to be a 'Covered Query' (`totalDocsExamined: 0`), and why is it optimal?",
+    "options": [
+      "A) The query must run on an encrypted SSL socket",
+      "B) All fields in the query filter and projection must be present in the index, and `_id` must be explicitly excluded (unless indexed), allowing MongoDB to satisfy the query entirely from RAM index memory without touching disk documents",
+      "C) The query must scan the entire collection",
+      "D) The collection must have fewer than 100 documents"
+    ],
+    "answer": "B",
+    "explanation": "A covered query is fulfilled entirely by index keys. Because MongoDB never accesses the actual document data on disk (`totalDocsExamined: 0`), it achieves the highest possible throughput and lowest I/O latency."
+  },
+  {
+    "id": "sr-mongo-06",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "open",
+    "topic": "Designing Shard Keys for High-Throughput Systems",
+    "question": "You are architecting a global IoT analytics platform on MongoDB storing 5 billion sensor readings per month. Queries query by `tenantId` and `timestamp`. Compare a Hashed Shard Key, a Ranged Shard Key, and a Compound Shard Key `{ tenantId: 1, timestamp: 1 }`. Which do you choose and why?",
+    "expectedKeyPoints": [
+      "Ranged key (timestamp) causes write hotspotting on the latest shard",
+      "Hashed key on tenantId or readingId distributes writes evenly but turns range queries into scatter-gather across all shards",
+      "Compound key { tenantId: 1, timestamp: 1 } clusters tenant data to specific shards, avoiding hotspotting across distinct tenants and enabling targeted shard routing for date range queries"
+    ],
+    "sampleAnswer": "1. Ranged on `timestamp`: Causes severe write hotspotting. Every sensor reading generated right now has an increasing timestamp, so 100% of inserts hammer the single shard holding the current time range.\n2. Hashed on `_id` or `timestamp`: Distributes write I/O uniformly across all shards, but every query searching for a tenant's date range must broadcast to *every* shard in the cluster ('scatter-gather'), degrading query throughput.\n3. Compound Shard Key `{ tenantId: 1, timestamp: 1 }` (Optimal):\n- Write Distribution: High cardinality across distinct tenants distributes concurrent writes across different shards.\n- Targeted Routing: When querying a specific tenant's data (`find({ tenantId: 't1', timestamp: { ... } })`), the `mongos` router directs the query exclusively to the single shard hosting that tenant, avoiding scatter-gather and optimizing read performance."
+  },
+  {
+    "id": "sr-mongo-07",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "open",
+    "topic": "Advanced Schema Design: Bucket and Subset Patterns",
+    "question": "Detail how the 'Bucket Pattern' and 'Subset Pattern' solve performance bottlenecks in massive MongoDB applications. Provide a concrete schema model for an IoT sensor or e-commerce product catalog.",
+    "expectedKeyPoints": [
+      "Bucket Pattern: Groups time-series readings into fixed-size documents (e.g. 1 document per hour with array of 60-3600 measurements), reducing document count by 1000x and index size dramatically",
+      "Subset Pattern: Embeds the top 5-10 most frequent items (e.g. recent reviews or product summary) in main document, offloading historical tail to separate collection to fit working set into RAM"
+    ],
+    "sampleAnswer": "1. The Bucket Pattern (IoT / Time-Series):\nInstead of inserting 1 document per second (producing 86,400 documents/day per device with massive index bloat), aggregate measurements into 1 document per hour:\n```json\n{\n  \"deviceId\": \"sensor_42\",\n  \"bucketStart\": ISODate(\"2026-09-24T00:00:00Z\"),\n  \"count\": 3600,\n  \"readings\": [\n    { \"t\": 0, \"temp\": 21.4, \"humidity\": 55 },\n    { \"t\": 1, \"temp\": 21.5, \"humidity\": 55 }\n  ]\n}\n```\nReduces index B-Tree size by 3,600x and speeds up range queries.\n2. The Subset Pattern (E-Commerce):\nA product might have 50,000 customer reviews. Loading all reviews on the product page wastes RAM and exceeds the 16MB document limit. Embed only the 10 most recent reviews in the `products` document. Store the remaining 49,990 reviews in a separate `reviews` collection fetched on demand with pagination."
+  },
+  {
+    "id": "sr-pg-01",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "PostgreSQL MVCC & Autovacuum Tuning",
+    "question": "In PostgreSQL Multi-Version Concurrency Control (MVCC), what does an `UPDATE` statement physically do to table pages on disk, and what happens if `autovacuum` cannot keep up?",
+    "options": [
+      "A) It modifies the existing bytes in place immediately without allocating disk space",
+      "B) It writes an entirely new row version (tuple) with updated values and marks the old tuple as dead (`xmax` set); if autovacuum cannot keep up, dead tuples accumulate, causing severe table/index 'bloat' and degrading sequential scan performance",
+      "C) It moves the row to an archive database",
+      "D) It locks the entire database server"
+    ],
+    "answer": "B",
+    "explanation": "PostgreSQL does not update rows in place. An `UPDATE` performs an `INSERT` of the new version and marks the previous tuple dead. VACUUM reclaims space occupied by dead tuples. Un-vacuumed dead tuples cause massive disk and cache bloat."
+  },
+  {
+    "id": "sr-pg-02",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "HOT (Heap-Only Tuples) Optimization",
+    "question": "What is the Heap-Only Tuple (HOT) optimization in PostgreSQL, and what condition must be met for it to activate?",
+    "options": [
+      "A) Storing tables in GPU memory",
+      "B) If an `UPDATE` does not modify any indexed columns and the new tuple fits into the exact same 8KB data page as the old tuple, PostgreSQL creates a HOT chain within the page, avoiding the need to update table indexes",
+      "C) Compressing text columns with gzip",
+      "D) Running queries without a WHERE clause"
+    ],
+    "answer": "B",
+    "explanation": "Index updates are expensive. With HOT, if indexed columns are untouched and the new row version fits in the same data page, PostgreSQL links old and new tuples internally on heap pages, eliminating index write amplification entirely."
+  },
+  {
+    "id": "sr-pg-03",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "SELECT FOR UPDATE SKIP LOCKED",
+    "question": "Why is `SELECT ... FOR UPDATE SKIP LOCKED` the gold standard for implementing high-concurrency transactional message queues in PostgreSQL?",
+    "options": [
+      "A) It prevents anyone from reading from the table",
+      "B) It allows multiple concurrent worker processes to lock and process distinct unclaimed rows simultaneously without blocking each other or waiting on locked rows",
+      "C) It encrypts messages in the queue",
+      "D) It bypasses ACID transactions"
+    ],
+    "answer": "B",
+    "explanation": "Standard `FOR UPDATE` blocks concurrent workers when they contend for the same row. `SKIP LOCKED` instructs workers to skip already-locked rows and grab the next available unlocked job, enabling lock-free concurrent queue processing."
+  },
+  {
+    "id": "sr-pg-04",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "CREATE INDEX CONCURRENTLY",
+    "question": "Why should production database migrations on active PostgreSQL tables always use `CREATE INDEX CONCURRENTLY` instead of standard `CREATE INDEX`?",
+    "options": [
+      "A) Standard `CREATE INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking all concurrent `SELECT`, `INSERT`, `UPDATE`, and `DELETE` operations until index construction finishes",
+      "B) `CONCURRENTLY` uses less RAM",
+      "C) Standard `CREATE INDEX` corrupts data if the server reboots",
+      "D) `CONCURRENTLY` is required for B-Tree indexes"
+    ],
+    "answer": "A",
+    "explanation": "Building an index on a 100-million-row table can take 30 minutes. Standard `CREATE INDEX` blocks all read and write queries, causing a major outage. `CREATE INDEX CONCURRENTLY` performs two table scans without blocking writes."
+  },
+  {
+    "id": "sr-pg-05",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "PgBouncer Pooling Modes",
+    "question": "What is the limitation of PgBouncer in `Transaction Pooling` mode compared to `Session Pooling` mode in a Node.js PERN stack?",
+    "options": [
+      "A) It does not support SQL queries",
+      "B) Named prepared statements, session-level advisory locks, and temporary tables cannot be used safely because consecutive queries in the same client session may execute over different underlying PostgreSQL backend connections",
+      "C) It only permits 1 connection total",
+      "D) It requires running PostgreSQL on Docker"
+    ],
+    "answer": "B",
+    "explanation": "In transaction pooling, PgBouncer assigns a server connection only for the duration of a transaction, returning it to the pool immediately upon `COMMIT`. Features tied to the physical connection session (like prepared statements) become unreliable unless configured with protocol-level workarounds."
+  },
+  {
+    "id": "sr-pg-06",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "open",
+    "topic": "Mastering EXPLAIN (ANALYZE, BUFFERS) Execution Plans",
+    "question": "Analyze the following PostgreSQL query execution node:\n`Bitmap Heap Scan on orders (cost=12.40..580.12 rows=140 width=64) (actual time=0.82..4.12 rows=150 loops=1)`\n`Buffers: shared hit=42 read=18`\nExplain what Bitmap Heap Scan, shared hit, and shared read mean. How do you tune memory parameters (`shared_buffers`, `work_mem`) based on buffer stats?",
+    "expectedKeyPoints": [
+      "Bitmap Index Scan gathers block locations matching predicate; Bitmap Heap Scan visits pages on disk to retrieve rows",
+      "Shared hit: Pages read directly from PostgreSQL RAM buffer pool cache",
+      "Shared read: Pages read from OS page cache or physical disk (I/O latency)",
+      "Tuning: High shared read indicates shared_buffers is too small or missing cache; Sort spilling to disk indicates work_mem must be increased"
+    ],
+    "sampleAnswer": "1. Bitmap Heap Scan:\nA two-stage scan. First, a `Bitmap Index Scan` scans the index and constructs an in-memory bitmap of physical page blocks containing matching rows. The `Bitmap Heap Scan` then visits those heap pages sequentially, minimizing random disk I/O.\n2. Buffer Statistics:\n- `shared hit=42`: 42 data pages (8KB each, ~336KB) were found cached in PostgreSQL's `shared_buffers` RAM, incurring zero disk I/O.\n- `shared read=18`: 18 pages were not in database RAM and had to be fetched from the OS page cache or physical NVMe disk.\n3. Memory Tuning:\n- If queries show high `shared read` ratios on hot tables, increase `shared_buffers` (typically 25% of total server RAM).\n- If an `EXPLAIN ANALYZE` sort or hash operation shows `Sort Method: external merge Disk`, increase `work_mem` for the session or database so sorts complete entirely in fast RAM."
+  },
+  {
+    "id": "sr-pg-07",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "open",
+    "topic": "Declarative Partitioning at Scale",
+    "question": "You manage an `audit_logs` table in PostgreSQL growing by 20 million rows per week. Design a declarative RANGE partitioning scheme by month. Explain how partition pruning works and how to drop old logs with zero lock overhead.",
+    "expectedKeyPoints": [
+      "CREATE TABLE audit_logs (...) PARTITION BY RANGE (created_at)",
+      "Create monthly partitions: CREATE TABLE audit_logs_2026_09 PARTITION OF audit_logs FOR VALUES FROM ('2026-09-01') TO ('2026-10-01')",
+      "Partition pruning: Query planner analyzes WHERE created_at >= ... and skips non-matching partition tables entirely",
+      "Zero-lock cleanup: DROP TABLE or ALTER TABLE DETACH PARTITION is instantaneous (metadata operation), avoiding expensive DELETE FROM table that causes dead tuple bloat"
+    ],
+    "sampleAnswer": "```sql\n-- 1. Create partitioned master table\nCREATE TABLE audit_logs (\n  id BIGINT GENERATED ALWAYS AS IDENTITY,\n  tenant_id UUID NOT NULL,\n  action TEXT NOT NULL,\n  created_at TIMESTAMPTZ NOT NULL,\n  PRIMARY KEY (id, created_at)\n) PARTITION BY RANGE (created_at);\n\n-- 2. Create monthly child partitions\nCREATE TABLE audit_logs_2026_09 PARTITION OF audit_logs\n  FOR VALUES FROM ('2026-09-01 00:00:00+00') TO ('2026-10-01 00:00:00+00');\n\nCREATE TABLE audit_logs_2026_10 PARTITION OF audit_logs\n  FOR VALUES FROM ('2026-10-01 00:00:00+00') TO ('2026-11-01 00:00:00+00');\n```\nBenefits:\n1. Partition Pruning: When a query includes `WHERE created_at >= '2026-09-15'`, the planner automatically prunes away October, November, and historical tables, scanning only the September table.\n2. Instant Zero-Overhead Purging: Instead of running a catastrophic `DELETE FROM audit_logs WHERE created_at < ...` (which bloats tables and generates millions of dead tuples), simply run:\n`ALTER TABLE audit_logs DETACH PARTITION audit_logs_2025_01;`\n`DROP TABLE audit_logs_2025_01;`\nThis metadata operation drops gigabytes of data in milliseconds without vacuum bloat."
+  },
+  {
+    "id": "sr-full-01",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Transactional Outbox Pattern",
+    "question": "What fundamental distributed systems problem does the Transactional Outbox Pattern solve when a PERN/MERN service updates a database and publishes an event to Kafka/RabbitMQ?",
+    "options": [
+      "A) It prevents users from sending spam emails",
+      "B) The 'Dual-Write Problem': where updating the database succeeds but publishing to the message broker fails (or vice versa), leading to data inconsistency across distributed services; the Outbox pattern saves the event inside the database transaction and a separate worker relays it to the broker",
+      "C) It encrypts network packets between microservices",
+      "D) It compresses Kafka messages"
+    ],
+    "answer": "B",
+    "explanation": "Writing to a database and publishing to a message broker are two independent network operations. Without 2-phase commit, one can succeed while the other fails. Writing the message to an `outbox` database table within the same ACID transaction guarantees at-least-once delivery."
+  },
+  {
+    "id": "sr-full-02",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Saga Pattern: Choreography vs Orchestration",
+    "question": "How does Saga Orchestration differ from Saga Choreography in managing distributed transactions across multiple microservices?",
+    "options": [
+      "A) Orchestration does not support rollback actions",
+      "B) Choreography has services publish and listen to domain events asynchronously without a central coordinator; Orchestration uses a centralized orchestrator service that commands participants to execute local transactions and coordinates compensating transactions on failure",
+      "C) Choreography only works with GraphQL",
+      "D) Orchestration requires all services to share the same PostgreSQL database"
+    ],
+    "answer": "B",
+    "explanation": "In Choreography, services react to events from peers (can become hard to trace as services grow). In Orchestration, a dedicated orchestrator orchestrates the workflow step-by-step, issuing commands and handling compensating actions when a step aborts."
+  },
+  {
+    "id": "sr-full-03",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "OAuth 2.0 PKCE Flow",
+    "question": "Why is Proof Key for Code Exchange (PKCE) mandatory for Single Page React Applications (SPAs) authenticating via OAuth 2.0?",
+    "options": [
+      "A) Because browser SPAs are 'public clients' that cannot securely protect a client secret; PKCE dynamically generates a cryptographic code verifier and code challenge, preventing authorization code interception attacks",
+      "B) PKCE speeds up network requests by 50%",
+      "C) PKCE stores passwords in the browser registry",
+      "D) It replaces HTTPS"
+    ],
+    "answer": "A",
+    "explanation": "Client-side JavaScript code and bundles are completely visible to users and attackers. Because SPAs cannot hold a secret, PKCE uses a dynamically generated cryptographic hash challenge to prove the entity exchanging the code is the same entity that initiated authorization."
+  },
+  {
+    "id": "sr-full-04",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Cache Stampede (Thundering Herd) Mitigation",
+    "question": "What is a 'Cache Stampede' and which technique effectively prevents it in high-traffic Redis architectures?",
+    "options": [
+      "A) When Redis crashes due to high network temperature",
+      "B) When a popular cache key expires and thousands of concurrent requests simultaneously miss the cache and hammer the database with identical queries; mitigated using Mutex locking (single-flight) or Probabilistic Early Expiration (XFetch)",
+      "C) When Redis keys contain emoji characters",
+      "D) When cache memory exceeds 1 Terabyte"
+    ],
+    "answer": "B",
+    "explanation": "A cache stampede causes database crashes when a hot key expires. Probabilistic Early Expiration (XFetch) or mutex locks allow only one worker to refresh the key while other requests serve the stale cache temporarily."
+  },
+  {
+    "id": "sr-full-05",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Zero-Downtime Blue-Green Deployments",
+    "question": "How do Blue-Green deployments achieve zero downtime and instant rollback capabilities?",
+    "options": [
+      "A) By rebooting all server instances at midnight",
+      "B) By running two identical production environments (Blue = live, Green = idle new version); once Green is validated, the load balancer switches 100% of traffic to Green instantly, with the ability to flip back to Blue if errors spike",
+      "C) By converting the database into a Git branch",
+      "D) By running Node.js in development mode"
+    ],
+    "answer": "B",
+    "explanation": "Blue-Green environments run in parallel. Traffic router/load balancer shifts incoming traffic to the newly deployed environment instantaneously. If an issue arises, traffic is immediately switched back to the old environment."
+  },
+  {
+    "id": "sr-full-06",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "open",
+    "topic": "Architecting a 100,000 Req/Sec PERN/MERN System",
+    "question": "Design a system architecture capable of handling 100,000 requests/second for a live event ticketing platform. Detail your edge caching, API gateway, connection pooling, database scaling (sharding/read replicas), and queue architecture.",
+    "expectedKeyPoints": [
+      "Edge: Cloudflare/Fastly CDN for static assets and caching read endpoints (stale-while-revalidate)",
+      "Gateway: Nginx / Envoy / Kong load balancing across stateless Node.js clusters with horizontal pod autoscaling (HPA)",
+      "Caching layer: Redis cluster (Cache-Aside with probabilistic early expiration, token bucket rate limiting)",
+      "Queue: Kafka / RabbitMQ to buffer ticket reservation writes asynchronously",
+      "Database: PostgreSQL with PgBouncer transaction pooling, master for writes, read replicas for browse queries, declarative partitioning by eventId"
+    ],
+    "sampleAnswer": "1. Edge Tier:\n- Cloudflare CDN: Edge caching of static frontend bundles and read-only endpoints (event schedules, venue maps). Rate limiting and DDoS protection (WAF).\n2. API Gateway & Compute Tier:\n- Envoy / Kong reverse proxy terminating TLS, performing JWT verification, and load balancing across stateless Express / Node.js pods managed by Kubernetes (K8s HPA).\n3. In-Memory & Caching Tier:\n- Redis Cluster: Cache-Aside pattern for event availability. Distributed locking with Redlock for seat selection to prevent double bookings. Token bucket rate limiter.\n4. Write Decoupling (Queue Tier):\n- Peak ticket purchasing requests are offloaded to Apache Kafka or RabbitMQ. The Express API pushes order jobs and returns HTTP 202 Accepted. Dedicated worker pools consume orders sequentially, shielding the database from concurrency spikes.\n5. Database Tier:\n- Primary PostgreSQL cluster with PgBouncer connection poolers in Transaction Pooling mode.\n- Asynchronous Read Replicas serving read traffic.\n- Declarative table partitioning on `orders` partitioned by `event_id` or date."
+  },
+  {
+    "id": "sr-full-07",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "open",
+    "topic": "The Dual-Write Problem and the Outbox Pattern",
+    "question": "Explain the Dual-Write problem in distributed architectures when an Express service must write to a database (PostgreSQL/MongoDB) and publish an event to a message broker (RabbitMQ/Kafka). Provide a full architecture and implementation pattern for the Transactional Outbox Pattern with Change Data Capture (Debezium) or a polling publisher.",
+    "expectedKeyPoints": [
+      "Problem: Writing to DB and publishing to Broker cannot be combined into a single atomic transaction without 2PC (which hurts availability)",
+      "Failure modes: DB commits but broker network fails (event lost); or broker publishes but DB transaction rolls back (ghost event sent)",
+      "Solution: Outbox table in same DB transaction. CDC tool (Debezium) reads DB WAL/oplog and streams events to Kafka reliably with at-least-once delivery guarantee"
+    ],
+    "sampleAnswer": "1. The Problem:\nConsider creating an order:\n```javascript\nawait db.orders.create(orderData);\nawait messageBroker.publish('order.created', orderData);\n```\nIf the broker fails or network drops after the DB write, the event is lost forever (other microservices never know the order exists). If you reverse the order and publish first, a database rollback leaves an invalid ghost event in the broker.\n2. Transactional Outbox Pattern:\nInstead of calling the broker directly, write the event into an `outbox` table *within the exact same database transaction*:\n```sql\nBEGIN;\nINSERT INTO orders (id, user_id, amount) VALUES ($1, $2, $3);\nINSERT INTO outbox_events (aggregate_type, aggregate_id, event_type, payload) \nVALUES ('Order', $1, 'OrderCreated', $payload);\nCOMMIT;\n```\nBecause both inserts happen in the same ACID transaction, both succeed or both fail atomically.\n3. Relay Options:\n- Change Data Capture (CDC with Debezium): Debezium tails the PostgreSQL Write-Ahead Log (WAL) or MongoDB Change Streams and automatically pushes outbox events to Kafka with zero polling overhead and at-least-once delivery guarantees.\n- Polling Publisher: A background Node.js worker periodically queries `SELECT * FROM outbox_events WHERE processed = false FOR UPDATE SKIP LOCKED` and publishes to the broker, marking records processed."
+  },
+  {
+    "id": "sr-react-17",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React Fiber Double Buffering",
+    "question": "How does React Fiber use the 'Double Buffering' technique during rendering?",
+    "options": [
+      "A) It renders to two different browser windows simultaneously",
+      "B) React maintains two fiber trees in memory: `current` (representing what is currently mounted on screen) and `workInProgress` (representing the draft being computed); upon completion of the commit phase, it flips a single root pointer to switch trees instantly with zero flicker",
+      "C) It caches all HTML in two Redis databases",
+      "D) It converts the screen into an OpenGL double buffer"
+    ],
+    "answer": "B",
+    "explanation": "Borrowing from graphics rendering, Fiber avoids incomplete UI updates by assembling the new draft off-screen in the `workInProgress` tree. At the end of the commit phase, React atomically swaps the pointer so `workInProgress` becomes `current`."
+  },
+  {
+    "id": "sr-react-18",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React 19 Action Hooks (useOptimistic)",
+    "question": "What is the primary role of the `useOptimistic` hook introduced in React 19?",
+    "options": [
+      "A) It generates positive motivational messages for developers",
+      "B) It allows UI state to update immediately with an optimistic value while an asynchronous server action is in flight, automatically rolling back to the confirmed server state if the action errors or completes",
+      "C) It removes the need for database backups",
+      "D) It forces the browser to assume all network requests will return 200"
+    ],
+    "answer": "B",
+    "explanation": "`useOptimistic` manages optimistic UI updates declaratively: the interface immediately reflects the user's expected result (e.g. sending a message or liking a post) and automatically reconciles when the actual server mutation settles."
+  },
+  {
+    "id": "sr-react-19",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Virtual List Windowing Algorithm",
+    "question": "How does virtualized list windowing (e.g. `react-window` or `tanstack-virtual`) maintain 60 FPS when scrolling through 1,000,000 items?",
+    "options": [
+      "A) It compresses all 1,000,000 items into a single string",
+      "B) It calculates the visible viewport bounding box and renders only the small subset of DOM nodes (e.g. 20-30 rows) currently visible plus a small buffer, positioning them absolutely via translateY while keeping total DOM nodes O(1)",
+      "C) It moves the list into a Web Worker",
+      "D) It renders the list onto an HTML5 canvas"
+    ],
+    "answer": "B",
+    "explanation": "Virtual windowing calculates scroll offset and container dimensions, dynamically mounting only the items visible in the viewport. This keeps the DOM lightweight (O(1) elements) regardless of list size, preventing DOM memory leaks and layout reflow stalls."
+  },
+  {
+    "id": "sr-react-20",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React Fiber Bailout (beginWork)",
+    "question": "Under what exact conditions will React Fiber's `beginWork` phase 'bail out' and skip reconciling an entire component subtree?",
+    "options": [
+      "A) When the browser window is minimized",
+      "B) If the component's `oldProps === newProps` (by reference equality), the component's state has not updated, and no context it consumes has changed, React clones the existing fiber and skips all child work",
+      "C) Only if the component is written in TypeScript",
+      "D) When the network connection is offline"
+    ],
+    "answer": "B",
+    "explanation": "During `beginWork`, Fiber checks reference equality on props and state. If `oldProps === newProps`, no scheduled update exists on the fiber, and no consumed context changed, React bails out, skipping work on all descendants."
+  },
+  {
+    "id": "sr-react-21",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "Micro-Frontend State Synchronization",
+    "question": "You have three independent React micro-frontends embedded on a single web page, each bundled with its own React root. Design a low-latency, decoupled event bus architecture using `BroadcastChannel` or `CustomEvent` to synchronize user authentication state and shopping cart updates without tight coupling.",
+    "expectedKeyPoints": [
+      "Uses browser native CustomEvents on window or BroadcastChannel API for cross-frame/cross-tab communication",
+      "Pub/Sub contract with typed payloads and versioned event names (e.g. APP_AUTH_STATE_CHANGED)",
+      "React custom hook (useMicroFrontendEvent) that subscribes on mount and cleans up on unmount",
+      "Avoids leaking memory and avoids dependency on shared global singletons across independent bundlers"
+    ],
+    "sampleAnswer": "1. Architecture Pattern:\nUse the native browser `BroadcastChannel` API (or `window.dispatchEvent(new CustomEvent(...))` for single-window):\n```javascript\n// shared-events.js (Contract)\nexport const EVENT_BUS = new BroadcastChannel('app_enterprise_bus');\n\nexport const MicroEvents = {\n  AUTH_CHANGE: 'AUTH_CHANGE',\n  CART_UPDATE: 'CART_UPDATE'\n};\n```\n2. Reusable React Hook:\n```javascript\nexport function useMicroEvent(eventType, handler) {\n  useEffect(() => {\n    const onMessage = (event) => {\n      if (event.data?.type === eventType) {\n        handler(event.data.payload);\n      }\n    };\n    EVENT_BUS.addEventListener('message', onMessage);\n    return () => EVENT_BUS.removeEventListener('message', onMessage);\n  }, [eventType, handler]);\n}\n```\n3. Benefits: Zero bundle coupling. Each micro-frontend can be built with different React versions or deployed independently while maintaining instantaneous, tear-free event synchronization."
+  },
+  {
+    "id": "sr-react-22",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "React Server Actions Security Forensics",
+    "question": "Analyze the security attack surfaces of React Server Actions in modern Fullstack frameworks (like Next.js 14/15). How do you prevent unauthorized execution, data exposure through closure captures, and CSRF attacks?",
+    "expectedKeyPoints": [
+      "Server Actions generate public HTTP POST endpoints that can be invoked directly by anyone with curl/fetch",
+      "Must verify authentication and authorization inside the Server Action body (not just on the rendering page)",
+      "Closure capture risk: Variables in server components closed over by inline actions can leak private data into the encrypted action ID payload",
+      "CSRF protection: Ensure framework validates Origin/Host headers or anti-CSRF tokens"
+    ],
+    "sampleAnswer": "1. The Core Attack Surface:\nEvery React Server Action (`'use server'`) is exported as an exposed, publicly reachable HTTP POST endpoint with a generated hash identifier. Attackers can call this action directly using `curl` or automated scripts, completely bypassing client-side button disables or form validations.\n2. Defenses:\n- Explicit Authorization: Always perform authentication and role checks inside the action body: `const session = await getSession(); if (!session?.user?.isAdmin) throw new ForbiddenError();`.\n- Strict Input Validation: Validate all incoming arguments using Zod schemas.\n- Closure Leak Prevention: Never close over sensitive server secrets or large database entities in inline Server Actions; the framework serializes closed-over variables into the action payload (often signed/encrypted), which increases payload size and risks exposure.\n- CSRF Defense: Modern frameworks verify the `Origin` and `Host` headers match for server action requests."
+  },
+  {
+    "id": "sr-node-11",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "V8 Hidden Classes & Inline Caches",
+    "question": "Why does dynamically adding properties to objects in different orders (e.g. `obj.a = 1; obj.b = 2` vs `obj.b = 2; obj.a = 1`) severely degrade V8 runtime execution speed?",
+    "options": [
+      "A) It causes syntax errors in strict mode",
+      "B) V8 creates different Hidden Classes (Shapes/Maps) based on the order of property assignments; differing shapes cause Inline Caches (ICs) to transition from monomorphic to polymorphic or megamorphic, disabling JIT-compiled fast property access",
+      "C) It causes the hard drive to fragment",
+      "D) It throws a TypeError at runtime"
+    ],
+    "answer": "B",
+    "explanation": "V8 creates transitions between hidden classes as properties are added. Assigning properties in identical orders allows V8 to reuse the same hidden class and maintain monomorphic inline caches (fastest). Differing orders force megamorphic lookups (slow dictionary search)."
+  },
+  {
+    "id": "sr-node-12",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Event Loop Latency Monitoring",
+    "question": "Which Node.js `perf_hooks` API allows measuring event loop delay percentiles (p50, p99, max) with microsecond precision?",
+    "options": [
+      "A) `perf_hooks.monitorEventLoopDelay({ resolution: 20 })`",
+      "B) `process.uptime()`",
+      "C) `console.time()`",
+      "D) `Date.now()`"
+    ],
+    "answer": "A",
+    "explanation": "`monitorEventLoopDelay()` samples the time difference between expected and actual event loop execution, recording delay distributions in an internal histogram to expose p99 latency spikes."
+  },
+  {
+    "id": "sr-node-13",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "HTTP Keep-Alive Timeout Hazards",
+    "question": "What bug occurs when Node's `server.keepAliveTimeout` is set SHORTER than an upstream reverse proxy's (e.g. AWS ALB or Nginx) keep-alive timeout?",
+    "options": [
+      "A) The proxy crashes with a 500 error",
+      "B) Race condition HTTP 502 Bad Gateway: Node closes the idle TCP socket just as the upstream proxy sends a new request down the wire",
+      "C) All HTTP requests become unencrypted",
+      "D) The server runs out of port numbers"
+    ],
+    "answer": "B",
+    "explanation": "If Node's keep-alive timeout is lower than the reverse proxy's timeout, Node sends a TCP FIN packet while the proxy is writing an incoming request, causing a socket hang-up and an intermittent 502 Bad Gateway error on the client."
+  },
+  {
+    "id": "sr-node-14",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "Diagnostic Reports (Node Report)",
+    "question": "What information is captured by `process.report.writeReport()` in Node.js?",
+    "options": [
+      "A) A summary of npm package downloads",
+      "B) A comprehensive diagnostic JSON dump containing native C++ call stacks, V8 heap statistics, libuv handle queues, OS resource limits, loaded dynamic libraries, and network interfaces",
+      "C) A list of all database queries executed today",
+      "D) Git commit history"
+    ],
+    "answer": "B",
+    "explanation": "Node.js Diagnostic Report outputs a rich JSON report detailing native thread backtraces, V8 heap memory usage, libuv event loop handles, and OS environment state, crucial for diagnosing native segmentation faults and deadlocks."
+  },
+  {
+    "id": "sr-node-15",
+    "level": "senior",
+    "stack": "node",
+    "type": "open",
+    "topic": "Diagnosing Native Memory Leaks Outside V8 Heap",
+    "question": "A Node.js microservice shows its Linux container memory (RSS) growing from 300MB to 4GB until killed by Linux OOM-killer, but V8 `process.memoryUsage().heapUsed` remains flat at 150MB. What causes native memory leaks outside the V8 heap, and what tools do you use to diagnose them?",
+    "expectedKeyPoints": [
+      "Causes: Unfreed Buffer allocations, zlib/crypto OpenSSL allocations, native C++ addons with memory leaks, Libuv thread allocations",
+      "Diagnosis: heapdump will not show it because it is outside V8 heap",
+      "Tools: jemalloc / TCMalloc with memory profiling, valgrind (massif), Linux /proc/$PID/smaps analysis, eBPF / bcc tools"
+    ],
+    "sampleAnswer": "1. Potential Root Causes:\n- Buffer Caching: `Buffer.allocUnsafe` or native streams buffering memory in C++ space outside V8 heap limits.\n- Native C++ Addons: Memory allocated via `malloc()` or `new` in a native module that lacks corresponding `free()` / `delete` in object destructors.\n- OpenSSL / Zlib leaks: Decompression streams (`zlib.createGunzip()`) that are not destroyed upon abort.\n2. Diagnostic Strategy:\n- `heapdump` and V8 snapshots are useless here because the leak resides outside V8 heap.\n- Inspect Linux memory maps: `cat /proc/<PID>/smaps | grep -i rss`.\n- Replace glibc allocator with `jemalloc` and enable heap profiling: `MALLOC_CONF=prof:true,prof_prefix:jeprof.out`.\n- Run load testing and analyze allocation dumps with `jeprof --show_bytes --pdf` to inspect the exact C++ allocation call tree."
+  },
+  {
+    "id": "sr-node-16",
+    "level": "senior",
+    "stack": "node",
+    "type": "open",
+    "topic": "High-Throughput Zero-Downtime Cluster Orchestration",
+    "question": "Design and write a master-worker cluster supervisor in Node.js that performs rolling zero-downtime reloads upon receiving `SIGHUP`. The supervisor must spawn a new worker, verify it is healthy, gracefully disconnect the old worker, and handle worker crashes automatically.",
+    "expectedKeyPoints": [
+      "Uses cluster module to fork workers matching os.cpus().length",
+      "Listens for SIGHUP to initiate rolling replacement",
+      "Spawns replacement worker, waits for 'listening' event, then sends disconnect to old worker with timeout",
+      "Listens for 'exit' event to auto-restart crashed workers unless intentionally killed"
+    ],
+    "sampleAnswer": "```javascript\nimport cluster from 'node:cluster';\nimport os from 'node:os';\n\nif (cluster.isPrimary) {\n  const numCPUs = os.cpus().length;\n  console.log(`Primary ${process.pid} running. Spawning ${numCPUs} workers...`);\n\n  for (let i = 0; i < numCPUs; i++) {\n    cluster.fork();\n  }\n\n  // Rolling reload on SIGHUP\n  process.on('SIGHUP', async () => {\n    console.log('Received SIGHUP. Initiating rolling reload...');\n    const workers = Object.values(cluster.workers);\n    for (const worker of workers) {\n      await new Promise((resolve) => {\n        const newWorker = cluster.fork();\n        newWorker.once('listening', () => {\n          worker.disconnect();\n          const timer = setTimeout(() => worker.kill(), 5000);\n          worker.once('exit', () => {\n            clearTimeout(timer);\n            resolve();\n          });\n        });\n      });\n    }\n    console.log('Rolling reload completed successfully.');\n  });\n\n  cluster.on('exit', (worker, code, signal) => {\n    if (!worker.exitedAfterDisconnect) {\n      console.warn(`Worker ${worker.process.pid} crashed (${signal || code}). Replacing...`);\n      cluster.fork();\n    }\n  });\n} else {\n  import('./server.js'); // Worker application code\n}\n```"
+  },
+  {
+    "id": "sr-express-08",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Idempotency via Redis Redlock",
+    "question": "When multiple microservices process distributed payments, why is the Redlock algorithm used over single-instance Redis locks?",
+    "options": [
+      "A) Redlock automatically encrypts credit cards",
+      "B) Single-instance Redis locks are vulnerable to single-point-of-failure and split-brain asynchronous replication race conditions; Redlock acquires locks across N independent master nodes with consensus, guaranteeing mutual exclusion even if nodes crash",
+      "C) Redlock is built into the HTTP specification",
+      "D) It requires no network requests"
+    ],
+    "answer": "B",
+    "explanation": "Redis replication is asynchronous. If Master A grants a lock and immediately crashes before replicating to its replica, the newly promoted replica will grant the same lock to another client. Redlock acquires locks across majority independent Redis masters to guarantee true distributed mutual exclusion."
+  },
+  {
+    "id": "sr-express-09",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Load Shedding & Request Prioritization",
+    "question": "What is 'Load Shedding' in a high-concurrency Express API Gateway, and how does it prevent cascading catastrophic failures?",
+    "options": [
+      "A) Turning off server room lights to save electricity",
+      "B) When system metrics (CPU, event loop latency) exceed safety thresholds, the server intentionally drops low-priority background requests (e.g. analytics, recommendations) with HTTP 503 so core revenue-critical transactions (checkout, login) can continue processing within SLA",
+      "C) Rebooting the database server every hour",
+      "D) Deleting cold database records"
+    ],
+    "answer": "B",
+    "explanation": "When a service is overloaded, continuing to accept all traffic causes queue buildup, timeouts, and system-wide collapse. Load shedding proactively rejects low-tier traffic, allowing the system to operate stably at peak capacity."
+  },
+  {
+    "id": "sr-express-10",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Singleflight Pattern (Request Collapsing)",
+    "question": "What is the Singleflight pattern (Request Collapsing / Deduplication) in an Express API gateway or proxy?",
+    "options": [
+      "A) Running all flights on a single airline",
+      "B) Suppressing duplicate concurrent identical read requests (e.g. 500 users requesting the exact same homepage config at the same millisecond) so that only ONE call goes downstream, sharing the result with all 500 callers",
+      "C) Forcing all HTTP requests through a single TCP packet",
+      "D) Compiling Express code into a single file"
+    ],
+    "answer": "B",
+    "explanation": "Singleflight intercepts identical in-flight read requests. Instead of hitting the database 500 times, it shares the single executing Promise across all simultaneous callers, preventing sudden stampedes on downstream services."
+  },
+  {
+    "id": "sr-express-11",
+    "level": "senior",
+    "stack": "express",
+    "type": "open",
+    "topic": "Implementing Singleflight Request Collapsing",
+    "question": "Write a production-ready Singleflight request deduplication wrapper in Node.js that coalesces concurrent identical asynchronous operations (by cache key) into a single execution.",
+    "expectedKeyPoints": [
+      "Maintains in-flight Map<string, Promise>",
+      "If key exists in map, return existing Promise",
+      "If not, create Promise, store in map, execute async operation",
+      "Always delete key from map in finally block after Promise settles (whether resolved or rejected)"
+    ],
+    "sampleAnswer": "```javascript\nexport class Singleflight {\n  constructor() {\n    this.inFlight = new Map();\n  }\n\n  async do(key, fn) {\n    if (this.inFlight.has(key)) {\n      return this.inFlight.get(key);\n    }\n\n    const promise = (async () => {\n      try {\n        return await fn();\n      } finally {\n        this.inFlight.delete(key);\n      }\n    })();\n\n    this.inFlight.set(key, promise);\n    return promise;\n  }\n}\n\n// Usage in Express controller:\n// const group = new Singleflight();\n// app.get('/products/:id', async (req, res) => {\n//   const data = await group.do(`product:${req.params.id}`, () => fetchProductFromDb(req.params.id));\n//   res.json(data);\n// });\n```"
+  },
+  {
+    "id": "sr-express-12",
+    "level": "senior",
+    "stack": "express",
+    "type": "open",
+    "topic": "Zero-Trust mTLS Architecture for Microservices",
+    "question": "Explain how Mutual TLS (mTLS) works between Express-based microservices. How does it eliminate perimeter-only security and enforce cryptographic authentication, authorization, and encryption between internal services?",
+    "expectedKeyPoints": [
+      "Both client and server present X.509 digital certificates to authenticate each other (two-way handshake)",
+      "Eliminates perimeter-only security (where internal network is trusted)",
+      "Enforces encryption in transit and identity verification via SAN (Subject Alternative Name) / SPIFFE ID",
+      "Can be implemented at application layer (https.createServer with requestCert: true) or infrastructure layer (Envoy / Istio service mesh)"
+    ],
+    "sampleAnswer": "1. Handshake Mechanics:\nIn standard TLS, only the server proves its identity with a certificate. In mTLS:\n- The server presents its certificate to the client.\n- The server requests the client's certificate (`requestCert: true, rejectUnauthorized: true`).\n- The client presents its certificate signed by an internal Root Certificate Authority (CA).\n- Both parties cryptographically authenticate each other before any HTTP/gRPC data flows.\n2. Zero-Trust Defense:\nTraditional architectures trust all internal network traffic once past the outer firewall. If an attacker breaches one pod, they can eavesdrop on all plaintext traffic. mTLS ensures that every inter-service call is encrypted and authenticated.\n3. Identity & Authorization:\nUsing SPIFFE IDs embedded in the certificate's SAN (e.g. `spiffe://cluster.local/ns/prod/sa/order-service`), the receiving service inspects who is calling and enforces fine-grained authorization (e.g., only `order-service` can call `/charge`)."
+  },
+  {
+    "id": "sr-mongo-11",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Replica Set Arbiters Hazards",
+    "question": "Why does MongoDB officially discourage the use of Arbiters in production replica set clusters?",
+    "options": [
+      "A) Arbiters consume 100GB of RAM",
+      "B) Arbiters hold no data; if a network partition isolates the primary and arbiter together, they can acknowledge writes that cannot meet `w: 'majority'`, and arbiters can trigger election loops and rollback hazards during complex partitions",
+      "C) Arbiters require paid licenses",
+      "D) Arbiters cannot run on Linux"
+    ],
+    "answer": "B",
+    "explanation": "Arbiters participate in elections but hold no data. Because they cannot vote on write concerns (`w: 'majority'`), losing a data node can prevent the cluster from acknowledging writes even if an arbiter is alive. A dedicated odd number of data-bearing nodes is far safer."
+  },
+  {
+    "id": "sr-mongo-12",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Change Streams with Resume Tokens",
+    "question": "How do MongoDB Change Streams achieve fault-tolerant, resilient event streaming after a network disconnect or consumer crash?",
+    "options": [
+      "A) By re-reading the entire database from document 1",
+      "B) Every change stream notification includes a unique `_id` resume token (`resumeAfter`); upon reconnection, the consumer passes this token to resume reading the oplog from the exact point of interruption without losing or duplicating events",
+      "C) By saving events to text files",
+      "D) Change streams cannot resume after a crash"
+    ],
+    "answer": "B",
+    "explanation": "Change Streams tail the internal MongoDB `oplog.rs`. Each event emits an opaque resume token. Supplying `{ resumeAfter: lastToken }` instructs MongoDB to resume streaming immediately following that specific oplog entry."
+  },
+  {
+    "id": "sr-mongo-13",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Zone Sharding (Geo-Partitioning)",
+    "question": "What is Zone Sharding in MongoDB and how does it fulfill regulatory requirements like GDPR?",
+    "options": [
+      "A) It groups shards by temperature",
+      "B) It maps specific shard key ranges (e.g. `country: 'DE'`) to designated geographic shard hardware zones located physically within the European Union, ensuring German citizens' data never leaves EU borders",
+      "C) It encrypts Wi-Fi zones",
+      "D) It partitions collections by file extension"
+    ],
+    "answer": "B",
+    "explanation": "Zone Sharding associates key ranges with tagged shard clusters in specific data centers. The MongoDB balancer migrates and pins documents to shards located in compliance regions, fulfilling strict data sovereignty laws (GDPR, HIPAA)."
+  },
+  {
+    "id": "sr-mongo-14",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "open",
+    "topic": "WiredTiger Memory Stalls & Eviction Tuning",
+    "question": "Explain what causes WiredTiger cache eviction stalls in write-heavy MongoDB systems. How do you monitor dirty cache percentage (`serverStatus().wiredTiger.cache`), and what settings mitigate eviction thrashing?",
+    "expectedKeyPoints": [
+      "When dirty cache exceeds eviction target (default 20%) or bytes in cache exceeds 80%, user application threads are forced to perform disk writes (eviction stalls)",
+      "Monitored via db.serverStatus().wiredTiger.cache['tracked dirty bytes in the cache']",
+      "Mitigation: Provision faster NVMe storage, increase wiredTigerEngineConfig.cacheSizeGB, adjust eviction trigger thresholds, scale horizontally via sharding"
+    ],
+    "sampleAnswer": "1. Eviction Stalls:\nWiredTiger relies on dedicated background eviction worker threads. If the write arrival rate outpaces disk I/O, dirty data builds up in RAM. When dirty bytes exceed the critical ceiling (default 20% of cache) or total cache exceeds 95%, WiredTiger forces the incoming application client threads to perform synchronous eviction before accepting new writes. Application latency spikes from 2ms to multiple seconds.\n2. Monitoring:\nInspect `db.serverStatus().wiredTiger.cache`:\n- `tracked dirty bytes in the cache` vs `maximum bytes configured`\n- `application threads page read from disk to cache count` (indicates cache misses)\n3. Mitigation:\n- Upgrade to high-IOPS NVMe SSD storage.\n- Tune `wiredTigerEngineConfig.cacheSizeGB`.\n- Partition write-heavy workloads using Sharding to distribute the dirty page eviction burden across multiple physical machines."
+  },
+  {
+    "id": "sr-mongo-15",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "open",
+    "topic": "Change Streams for Event-Driven Microservices",
+    "question": "Write a production Node.js service using MongoDB Change Streams that monitors updates to an `orders` collection, processes newly completed payments, and guarantees fault tolerance using stored resume tokens in Redis.",
+    "expectedKeyPoints": [
+      "Opens change stream with pipeline filter { 'updateDescription.updatedFields.status': 'completed' }",
+      "Retrieves resume token from Redis on startup (resumeAfter)",
+      "Processes event idempotently and writes new resume token (_id) to Redis after each event",
+      "Handles error events and reconnects with stored resume token"
+    ],
+    "sampleAnswer": "```javascript\nimport { MongoClient } from 'mongodb';\nimport Redis from 'ioredis';\n\nconst redis = new Redis();\nconst mongo = new MongoClient(process.env.MONGO_URI);\n\nexport async function startOrderStream() {\n  await mongo.connect();\n  const collection = mongo.db('commerce').collection('orders');\n  \n  const lastToken = await redis.get('mongo:stream:orders:resume_token');\n  const options = lastToken ? { resumeAfter: JSON.parse(lastToken) } : {};\n\n  const pipeline = [\n    { $match: { operationType: 'update', 'updateDescription.updatedFields.status': 'completed' } }\n  ];\n\n  const stream = collection.watch(pipeline, options);\n  console.log('\u26a1 Order Change Stream active with resume token recovery...');\n\n  for await (const change of stream) {\n    try {\n      const orderId = change.documentKey._id;\n      console.log(`Processing completed order: ${orderId}`);\n      \n      // Execute business logic (e.g. dispatch invoice email, trigger fulfillment)\n      await processFulfillment(orderId);\n      \n      // Persist resume token only AFTER successful processing\n      await redis.set('mongo:stream:orders:resume_token', JSON.stringify(change._id));\n    } catch (err) {\n      console.error('Error processing change event:', err);\n      // Implement backoff or dead letter alert\n    }\n  }\n}\n```"
+  },
+  {
+    "id": "sr-pg-11",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "Transaction ID (TXID) Wraparound Disaster",
+    "question": "What catastrophic event occurs if PostgreSQL reaches the 2-billion transaction limit without freezing old transaction IDs via VACUUM?",
+    "options": [
+      "A) The database switches all numbers to negative",
+      "B) Transaction ID Wraparound: Past transactions appear to have occurred in the future due to modular arithmetic, making past data invisible; to prevent silent data corruption, PostgreSQL shuts down and refuses all write connections until vacuumed in single-user mode",
+      "C) The database deletes all indexes",
+      "D) The operating system crashes"
+    ],
+    "answer": "B",
+    "explanation": "PostgreSQL transaction IDs are 32-bit unsigned integers (modulo 2^32). Without VACUUM freezing old tuples (`FreezeLimit`), ID wraparound causes past commits to appear in the future, rendering data invisible. PostgreSQL halts to protect integrity."
+  },
+  {
+    "id": "sr-pg-12",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "Row-Level Security (RLS) in Multi-Tenant SaaS",
+    "question": "How does PostgreSQL Row-Level Security (RLS) eliminate multi-tenant data leakage risks in a PERN architecture?",
+    "options": [
+      "A) It encrypts each row with a different password",
+      "B) It enforces security policies directly at the database engine level (e.g. `USING (tenant_id = current_setting('app.current_tenant_id'))`), ensuring queries can never access another tenant's rows even if a developer forgets a `WHERE tenant_id = ...` clause in Node.js",
+      "C) It creates a separate database table for every single customer",
+      "D) It disables SQL joins"
+    ],
+    "answer": "B",
+    "explanation": "RLS injects mandatory security filter conditions into every query plan behind the scenes. Even if an Express route has an IDOR vulnerability or a missing WHERE clause, PostgreSQL refuses to return rows outside the current session's tenant ID."
+  },
+  {
+    "id": "sr-pg-13",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "Advisory Locks for Distributed Coordination",
+    "question": "What is the unique advantage of PostgreSQL Advisory Locks (`pg_advisory_lock`) for distributed task synchronization over row-level locks?",
+    "options": [
+      "A) Advisory locks never unlock",
+      "B) They are application-defined cooperative locks identified by an arbitrary 64-bit integer that do not require creating, locking, or modifying any physical table rows",
+      "C) Advisory locks work without a database connection",
+      "D) They speed up SELECT queries by 10x"
+    ],
+    "answer": "B",
+    "explanation": "Advisory locks allow applications to coordinate distributed mutexes using PostgreSQL's high-speed in-memory lock table without modifying tables or dealing with deadlocks on data rows."
+  },
+  {
+    "id": "sr-pg-14",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "open",
+    "topic": "PostgreSQL Autovacuum Tuning for High-Write Systems",
+    "question": "Explain why default PostgreSQL autovacuum settings are inadequate for high-throughput transactional databases. Which configuration parameters (`autovacuum_vacuum_scale_factor`, `autovacuum_vacuum_cost_limit`, `autovacuum_max_workers`) must be tuned and why?",
+    "expectedKeyPoints": [
+      "Default scale factor is 0.2 (20% of rows must change before vacuum triggers); on a 100M-row table, that requires 20M dead tuples before vacuuming starts, causing massive bloat",
+      "Tune autovacuum_vacuum_scale_factor to 0.01-0.05 (or per-table threshold) so vacuum runs continuously in small increments",
+      "Default autovacuum_vacuum_cost_limit (200) throttles I/O severely; increase to 1000-2000 on modern NVMe drives",
+      "Tune maintenance_work_mem to allow workers to store more dead tuple pointers in RAM before scanning indexes"
+    ],
+    "sampleAnswer": "1. The Problem with Defaults:\nBy default, `autovacuum_vacuum_scale_factor = 0.2`. On a table with 100 million rows, autovacuum will not even trigger until 20 million rows are modified! By that time, 20 million dead tuples have bloated the table and indexes, crippling cache efficiency.\n2. Parameter Tuning for High Throughput:\n- `autovacuum_vacuum_scale_factor = 0.02`: Lowers trigger threshold to 2% (or set per-table with `ALTER TABLE hot_table SET (autovacuum_vacuum_scale_factor = 0.01)`).\n- `autovacuum_vacuum_cost_limit = 2000` (up from default 200): Modern NVMe SSDs can handle vastly higher I/O; increasing the cost limit prevents workers from sleeping unnecessarily.\n- `autovacuum_vacuum_cost_delay = 2ms` (down from 20ms in older versions).\n- `maintenance_work_mem = 1GB`: Allows workers to track up to 1 billion dead tuple pointers in fast memory per pass, minimizing index re-scans."
+  },
+  {
+    "id": "sr-pg-15",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "open",
+    "topic": "Zero-Downtime Safe DDL Migrations in PostgreSQL",
+    "question": "Detail how to safely perform three dangerous DDL operations on an active PostgreSQL table with 100 million rows without blocking user transactions: 1) Adding a `NOT NULL` column, 2) Creating a foreign key constraint, 3) Dropping a column.",
+    "expectedKeyPoints": [
+      "1. NOT NULL: Add column as NULLABLE -> Add CHECK (col IS NOT NULL) NOT VALID -> VALIDATE CONSTRAINT -> Set NOT NULL (avoids full table rewrite lock)",
+      "2. Foreign Key: ADD CONSTRAINT ... FOREIGN KEY ... NOT VALID (takes brief SHARE ROW EXCLUSIVE lock without scanning table) -> VALIDATE CONSTRAINT (scans table with non-blocking SHARE UPDATE EXCLUSIVE lock)",
+      "3. Drop Column: Set lock_timeout to 2s to avoid blocking queue; ALTER TABLE DROP COLUMN is metadata-only in modern Postgres (PG 11+)"
+    ],
+    "sampleAnswer": "1. Adding a `NOT NULL` Column Safely:\nRunning `ALTER TABLE users ADD COLUMN status TEXT NOT NULL DEFAULT 'active'` rewrites the entire table and holds an `ACCESS EXCLUSIVE` lock for hours.\n- Safe Solution:\n  Step 1: `ALTER TABLE users ADD COLUMN status TEXT DEFAULT 'active';` (Instant metadata in PG 11+).\n  Step 2: `ALTER TABLE users ADD CONSTRAINT status_not_null CHECK (status IS NOT NULL) NOT VALID;` (Instant, no scan).\n  Step 3: `ALTER TABLE users VALIDATE CONSTRAINT status_not_null;` (Scans table in background without write locks).\n2. Adding a Foreign Key Safely:\n- `ALTER TABLE orders ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) NOT VALID;`\n- `ALTER TABLE orders VALIDATE CONSTRAINT fk_user;`\n3. Lock Queue Defense:\nAlways set `SET lock_timeout = '2s';` before any DDL so if a lock cannot be acquired immediately, the query fails fast rather than piling up behind a slow transaction and stalling all incoming production queries."
+  },
+  {
+    "id": "sr-full-08",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "CRDTs vs Operational Transformation (OT)",
+    "question": "Why are Conflict-free Replicated Data Types (CRDTs, like Yjs / Automerge) replacing Operational Transformation (OT) in modern real-time collaborative web applications?",
+    "options": [
+      "A) CRDTs only work without an internet connection",
+      "B) OT requires a central authoritative server to order and transform all concurrent operations sequentially; CRDTs are mathematically commutative and converge deterministically on all peers, enabling true peer-to-peer, decentralized, and offline-first collaboration",
+      "C) CRDTs encrypt all text with SHA-512",
+      "D) OT was outlawed by the W3C"
+    ],
+    "answer": "B",
+    "explanation": "Operational Transformation (Google Docs style) relies heavily on a centralized coordination server to serialize transforms. CRDTs use mathematically sound distributed data structures where operations can arrive in any order and converge deterministically to the identical state."
+  },
+  {
+    "id": "sr-full-09",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Event Sourcing vs Traditional State",
+    "question": "What is the fundamental architectural principle of Event Sourcing in enterprise PERN/MERN systems?",
+    "options": [
+      "A) Deleting logs after 7 days",
+      "B) Instead of storing only the current snapshot state in the database, every state transition is recorded as an immutable, append-only event; the current state is derived by replaying the event log stream",
+      "C) Compiling React components into audio files",
+      "D) Storing all data in browser cookies"
+    ],
+    "answer": "B",
+    "explanation": "Traditional CRUD mutates state in place, losing historical context. In Event Sourcing, the append-only event stream is the single source of truth. Current state projections are materialized views, enabling complete auditability, time-travel debugging, and historical replays."
+  },
+  {
+    "id": "sr-full-10",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Consistent Hashing with Virtual Nodes",
+    "question": "Why does consistent hashing with virtual nodes prevent data skew when scaling distributed cache nodes (Redis/Memcached)?",
+    "options": [
+      "A) It prevents hackers from accessing cache keys",
+      "B) In simple modulo hashing (`hash(key) % N`), adding a node reshuffles nearly 100% of keys; consistent hashing maps keys and nodes onto a circular ring, moving only K/N keys when nodes scale, while virtual nodes ensure uniform distribution across servers",
+      "C) It eliminates all RAM consumption",
+      "D) It only works on 64-bit systems"
+    ],
+    "answer": "B",
+    "explanation": "Standard modulo hashing invalidates the entire cache when node count changes. Consistent hashing minimizes remapping to only `1/N` keys. Virtual nodes allocate multiple positions per physical server, smoothing out hash distribution and preventing hotspotting."
+  },
+  {
+    "id": "sr-full-11",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "open",
+    "topic": "Designing a Real-Time Collaborative Canvas (Figma-Style)",
+    "question": "Architect a real-time collaborative canvas (like Figma or Miro) supporting 100 concurrent editors per document. Detail your client-side data structures (CRDTs), transport protocol (WebSockets with binary Protobuf/BSON), server room coordination, and offline reconciliation.",
+    "expectedKeyPoints": [
+      "Data structures: Yjs / Automerge CRDTs for deterministic convergence without central locking",
+      "Transport: WebSockets transferring binary encoded delta updates (Uint8Array) rather than verbose JSON",
+      "Server room coordination: Node.js WebSocket cluster with Redis Pub/Sub room sharding (rooms pinned via sticky sessions or distributed gateway)",
+      "Persistence: PostgreSQL storing periodic binary snapshot checkpoints and incremental event log in outbox",
+      "Offline: IndexedDB local persistence; upon reconnection, Yjs calculates state vector diffs and syncs minimal binary deltas"
+    ],
+    "sampleAnswer": "1. Client Data Layer (CRDT):\nUse `Yjs` or `Automerge`. Document state (shapes, layers, coordinates) is represented as a shared Y.Doc. Updates generate compact binary deltas (`Y.encodeStateAsUpdate`). Because CRDTs are commutative, operations merge deterministically without server-side locking.\n2. Transport Layer:\nPersistent WebSocket connections transmitting binary frames (`Uint8Array`) using Protocol Buffers or raw Yjs delta packets, minimizing serialization latency and bandwidth.\n3. Server Architecture:\n- Stateless Node.js WebSocket gateway servers clustered behind an Nginx Layer 7 load balancer with sticky session routing by `documentId`.\n- Redis Pub/Sub backplane allows editors connected to different gateway instances in the same room to receive peer updates.\n4. Persistence Strategy:\n- Write deltas to an in-memory buffer and periodically flush compressed state vectors to PostgreSQL/S3 every 30 seconds as snapshot checkpoints.\n- Store transactional deltas in an append-only PostgreSQL table.\n5. Offline Support:\nLocal edits persist in browser `IndexedDB`. When the client reconnects, it computes a State Vector diff with the server, exchanging only missing binary delta chunks with zero data loss."
+  },
+  {
+    "id": "sr-full-12",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "open",
+    "topic": "Disaster Recovery: Multi-Region Active-Active vs Active-Passive",
+    "question": "Contrast an Active-Passive (Warm Standby) disaster recovery architecture with an Active-Active multi-region deployment for an enterprise PERN application. Analyze RPO (Recovery Point Objective), RTO (Recovery Time Objective), write conflicts, and cost trade-offs.",
+    "expectedKeyPoints": [
+      "Active-Passive: Primary region handles 100% of traffic; secondary region receives asynchronous replication (streaming WAL). RTO = minutes (DNS failover time), RPO = seconds (replication lag). Cheaper, zero write conflicts",
+      "Active-Active: Both regions accept writes concurrently. RTO = 0 (instant failover). RPO = 0. Major challenges: Bi-directional replication latency, split-brain hazards, distributed write conflict resolution (CRDTs or last-write-wins), 2x-3x higher infrastructure cost",
+      "Recommendation: Active-Passive with automated health checks and read-only secondaries is typically the optimal balance for relational databases"
+    ],
+    "sampleAnswer": "1. Active-Passive (Warm / Hot Standby):\n- Architecture: Region A (Primary) handles all reads and writes. Data replicates asynchronously via physical streaming replication to Region B (Standby).\n- RPO (Recovery Point Objective): A few seconds (equal to replication lag).\n- RTO (Recovery Time Objective): 1-5 minutes (time to detect failure, promote standby to primary, and update Route 53 DNS records).\n- Trade-offs: Zero write-conflict anomalies, simpler operational model, lower cost.\n2. Active-Active (Multi-Region):\n- Architecture: Both Region A and Region B actively process reads and writes concurrently for local users.\n- RPO / RTO: Near zero instantaneous failover.\n- Trade-offs & Critical Hazards:\n  - Relational Conflict: Two users in different regions updating the same user profile concurrently causes cross-region split-brain. Requires bi-directional logical replication with conflict resolution rules (e.g. Last-Write-Wins or CRDT fields).\n  - Cross-Region Latency: Synchronous multi-region consensus (e.g. CockroachDB / Spanner) adds 50-100ms speed-of-light round-trip latency to every write.\n  - Cost: 2.5x higher cloud infrastructure spend."
+  },
+  {
+    "id": "sr-react-23",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "Custom React Reconciler",
+    "question": "Which package is used to build custom React renderers that target environments other than the browser DOM (e.g. CLI terminals, Canvas, Three.js)?",
+    "options": [
+      "A) `react-dom`",
+      "B) `react-reconciler`",
+      "C) `react-native-web`",
+      "D) `react-compiler`"
+    ],
+    "answer": "B",
+    "explanation": "`react-reconciler` allows developers to implement host config methods (`createInstance`, `appendInitialChild`, `commitUpdate`) to render React components to custom targets like terminal TUIs (Ink), Canvas, or WebGL."
+  },
+  {
+    "id": "sr-react-24",
+    "level": "senior",
+    "stack": "react",
+    "type": "mcq",
+    "topic": "React 18 Tearing Mechanics",
+    "question": "What is 'visual tearing' in concurrent React rendering?",
+    "options": [
+      "A) When an LCD screen cracks physically",
+      "B) When two components on the screen display conflicting data values from the same external store during the same render pass because an external store mutation was processed between yielded render slices",
+      "C) When CSS animations drop below 30 FPS",
+      "D) An image decoding error in WebP"
+    ],
+    "answer": "B",
+    "explanation": "Tearing occurs when a mutable external data source updates while concurrent React is midway through a time-sliced render, leading to different components displaying inconsistent state snapshots."
+  },
+  {
+    "id": "sr-react-25",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "Custom Virtual DOM Terminal Renderer Architecture",
+    "question": "How does a library like Ink or a custom React terminal renderer translate JSX elements like `<Box>` and `<Text>` into terminal ANSI escape codes and manage terminal resize events?",
+    "expectedKeyPoints": [
+      "Uses react-reconciler host config (createInstance, appendChild, commitUpdate)",
+      "Uses Yoga layout engine (compiled C/WebAssembly flexbox) to calculate terminal row/column coordinates",
+      "Writes ANSI escape sequences and cursor movement codes to process.stdout",
+      "Listens for process.stdout.on('resize') to trigger re-layout and re-render"
+    ],
+    "sampleAnswer": "1. Host Configuration with `react-reconciler`:\nImplements host methods (`createInstance`, `appendInitialChild`, `commitUpdate`). Elements like `<Box>` and `<Text>` create internal node instances representing layout and text nodes.\n2. Flexbox in the Terminal:\nUses Facebook's Yoga engine (a flexbox layout engine in WebAssembly/C) to compute exact character column and row coordinates from CSS-like properties (`flexDirection`, `padding`).\n3. ANSI Output:\nOn commit, the renderer traverses the layout tree and writes ANSI escape codes (cursor positioning, color codes, clean line sequences) directly to `process.stdout`.\n4. Resize Handling:\nListens to `process.stdout.on('resize')`, updates Yoga root node dimensions, and triggers a full reconciliation."
+  },
+  {
+    "id": "sr-react-26",
+    "level": "senior",
+    "stack": "react",
+    "type": "open",
+    "topic": "Deep Profiling: Wasted Renders vs Layout Triggers",
+    "question": "Explain how to use React DevTools Profiler and Chrome DevTools Performance panel in tandem to diagnose severe frame drops caused by layout thrashing (forced synchronous reflow) inside `useLayoutEffect`.",
+    "expectedKeyPoints": [
+      "React Profiler identifies which components rendered and how long commit took",
+      "Chrome Performance panel captures browser main thread: Layout, Recalculate Style, Paint",
+      "useLayoutEffect runs synchronously immediately after DOM mutations before browser paint; reading layout properties (offsetWidth, scrollHeight) forces browser layout thrashing",
+      "Fix: Batch DOM reads before writes or move logic to useEffect / ResizeObserver"
+    ],
+    "sampleAnswer": "1. React Profiler: Highlights components with long render or commit durations in flamecharts. However, it cannot show what the browser main thread is doing.\n2. Chrome Performance Panel: Captures bottom-up flamecharts of the browser engine. Forced synchronous layouts appear as red warning banners: 'Forced reflow is a likely performance bottleneck'.\n3. The `useLayoutEffect` Hazard:\n`useLayoutEffect` fires synchronously before the browser paints. If code mutates a DOM style (`element.style.width = '100px'`) and immediately reads a layout property (`element.offsetHeight`), it forces the browser to synchronously recalculate layout on the spot ('layout thrashing').\n4. Resolution:\n- Batch reads before writes.\n- Use `requestAnimationFrame`.\n- Prefer `ResizeObserver` for measuring DOM dimensions asynchronously."
+  },
+  {
+    "id": "sr-node-17",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "V8 TurboFan De-Optimization",
+    "question": "What triggers V8's TurboFan compiler to 'de-optimize' hot machine code back to Ignition bytecode at runtime?",
+    "options": [
+      "A) Running out of disk space",
+      "B) Type feedback violation: when a function previously optimized assuming stable types (e.g. always receiving numbers) receives an unexpected type (e.g. an object or string), invalidating JIT optimization assumptions",
+      "C) Changing the Node.js port",
+      "D) Closing an HTTP socket"
+    ],
+    "answer": "B",
+    "explanation": "TurboFan generates optimized machine code based on speculative type feedback from the Ignition interpreter. Passing an unexpected data type breaks the speculative assumption, forcing V8 to 'deopt' back to interpreted bytecode."
+  },
+  {
+    "id": "sr-node-18",
+    "level": "senior",
+    "stack": "node",
+    "type": "mcq",
+    "topic": "TCP_NODELAY (Nagle's Algorithm)",
+    "question": "Why does Node.js enable `socket.setNoDelay(true)` (disabling Nagle's algorithm) by default for TCP sockets?",
+    "options": [
+      "A) To encrypt TCP packets",
+      "B) To send small data packets immediately across the network without waiting to buffer them into full MTU frames, minimizing latency for real-time APIs and WebSockets",
+      "C) To prevent packet collisions",
+      "D) To reduce CPU usage on the client"
+    ],
+    "answer": "B",
+    "explanation": "Nagle's algorithm coalesces small TCP packets to reduce network overhead, but causes artificial 40ms delays when combined with TCP delayed ACKs. Disabling it (`TCP_NODELAY=1`) sends bytes instantly."
+  },
+  {
+    "id": "sr-node-19",
+    "level": "senior",
+    "stack": "node",
+    "type": "open",
+    "topic": "Libuv Threadpool Contention Detection Script",
+    "question": "Write a production Node.js monitoring script that detects when libuv's internal thread pool is saturated (threadpool starvation) and alerts before API latency degrades.",
+    "expectedKeyPoints": [
+      "Thread pool handles fs, crypto, zlib, dns.lookup",
+      "Benchmark threadpool latency by periodically executing a lightweight crypto.pbkdf2 task and measuring drift from baseline",
+      "If execution duration exceeds threshold (e.g. > 50ms for a 5ms task), thread pool starvation is occurring",
+      "Logs alert with recommendations to increase UV_THREADPOOL_SIZE"
+    ],
+    "sampleAnswer": "```javascript\nimport crypto from 'node:crypto';\n\nexport function monitorThreadpool(intervalMs = 2000, thresholdMs = 40) {\n  setInterval(() => {\n    const start = performance.now();\n    // Lightweight task dispatched to libuv threadpool\n    crypto.pbkdf2('test', 'salt', 100, 16, 'sha512', (err) => {\n      const duration = performance.now() - start;\n      if (duration > thresholdMs) {\n        console.warn(\n          `\ud83d\udea8 [LIBUV THREADPOOL STARVATION] Duration: ${duration.toFixed(2)}ms (expected < 5ms). ` +\n          `Thread pool is saturated! Current UV_THREADPOOL_SIZE=${process.env.UV_THREADPOOL_SIZE || 4}`\n        );\n      }\n    });\n  }, intervalMs).unref(); // unref so timer doesn't prevent clean shutdown\n}\n```"
+  },
+  {
+    "id": "sr-node-20",
+    "level": "senior",
+    "stack": "node",
+    "type": "open",
+    "topic": "Handling EMFILE and Linux File Descriptor Limits",
+    "question": "What causes an `EMFILE: too many open files` error in a high-concurrency Node.js server, and how do you resolve it at the OS level (ulimit / systemd) and application level (graceful-fs / connection pooling)?",
+    "expectedKeyPoints": [
+      "In Linux, every TCP socket, open file, and database connection consumes a File Descriptor (FD)",
+      "Default OS limit is often 1024; high concurrency easily exceeds this limit",
+      "OS resolution: Increase soft and hard limits via ulimit -n 65535 or /etc/security/limits.conf or systemd LimitNOFILE=65536",
+      "Application resolution: Use connection pools with strict caps, close idle sockets with keepAliveTimeout, use graceful-fs to queue file opens"
+    ],
+    "sampleAnswer": "1. Root Cause:\nIn Linux, 'everything is a file'. Every incoming HTTP TCP socket, outgoing database connection, and file read consumes a File Descriptor (FD). Default Linux user limits are often set to 1,024 FDs. Under moderate load (e.g. 1,500 concurrent connections), Node crashes with `Error: EMFILE, too many open files`.\n2. Operating System Resolution:\n- Temporary: `ulimit -n 65536`.\n- Permanent: In `/etc/security/limits.conf`:\n  `* soft nofile 65536`\n  `* hard nofile 65536`\n- In Systemd service files: Add `LimitNOFILE=65536`.\n3. Application Architecture Defenses:\n- Cap database connection pools (e.g. `max: 20` in `pg.Pool`).\n- Set strict HTTP agent maxSockets: `new http.Agent({ maxSockets: 100 })`.\n- Use `graceful-fs` to queue file reads when FD limits are approached instead of crashing."
+  },
+  {
+    "id": "sr-express-13",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "Request Hedging (Speculative Retries)",
+    "question": "What is 'Request Hedging' (Speculative Retries) in an ultra-low-latency distributed API gateway?",
+    "options": [
+      "A) Betting on foreign currencies",
+      "B) If a downstream microservice has not responded within the p95 latency threshold (e.g. 50ms), the gateway sends an identical redundant request to a second replica and accepts whichever response arrives first, canceling the other",
+      "C) Retrying failed requests 1,000 times",
+      "D) Caching requests in browser memory"
+    ],
+    "answer": "B",
+    "explanation": "Popularized by Google's 'The Tail at Scale', request hedging eliminates latency outliers by issuing a speculative backup request to another replica when the primary takes longer than expected, slashing tail (p99) latency."
+  },
+  {
+    "id": "sr-express-14",
+    "level": "senior",
+    "stack": "express",
+    "type": "mcq",
+    "topic": "CSP Nonce Generation in Express SSR",
+    "question": "Why must a Content-Security-Policy (CSP) `nonce` be cryptographically unique per HTTP request when server-rendering React?",
+    "options": [
+      "A) To encrypt the CSS stylesheet",
+      "B) If a nonce is static or predictable, attackers can inject malicious `<script nonce='static_val'>` tags, completely nullifying the CSP protection",
+      "C) Nonces are required by SQL databases",
+      "D) To save server bandwidth"
+    ],
+    "answer": "B",
+    "explanation": "A CSP nonce must be generated freshly on every request using a cryptographically secure random generator (e.g. `crypto.randomBytes(16).toString('base64')`). Predictable or reusable nonces allow attackers to bypass CSP."
+  },
+  {
+    "id": "sr-express-15",
+    "level": "senior",
+    "stack": "express",
+    "type": "open",
+    "topic": "High-Throughput Zero-Copy File Serving",
+    "question": "How does Express's `res.sendFile()` utilize the Linux `sendfile(2)` system call for zero-copy file transfers? How does this outperform reading files into JavaScript memory?",
+    "expectedKeyPoints": [
+      "Traditional file transfer: reads disk into kernel buffer -> copies to user space (Node RAM) -> copies back to kernel socket buffer -> NIC",
+      "sendfile(2) system call transfers data directly from file descriptor to network socket descriptor inside kernel space",
+      "Zero context switching between user space and kernel space, zero V8 heap allocation, line-rate throughput"
+    ],
+    "sampleAnswer": "1. Traditional Node.js Read/Write Overhead:\nRunning `fs.readFile()` and `res.write()` requires 4 context switches and 3 memory copies:\n- Disk -> Kernel page cache (1)\n- Kernel page cache -> Node.js user-space Buffer (2)\n- Node.js user-space Buffer -> Socket buffer in kernel (3)\n- Socket buffer -> Network Interface Card (NIC) (4)\nThis causes heavy CPU context switching and V8 heap pressure.\n2. Zero-Copy `sendfile(2)`:\nWhen you use `res.sendFile()`, Node invokes the OS `sendfile` system call. The Linux kernel transfers data directly from the filesystem cache to the network card buffer entirely within kernel space.\nBenefits: Zero data is copied into Node's memory, CPU utilization drops to near zero, and file transfers saturate network line rate."
+  },
+  {
+    "id": "sr-express-16",
+    "level": "senior",
+    "stack": "express",
+    "type": "open",
+    "topic": "Distributed Lock Manager with Lease Watchdog",
+    "question": "Write a production-grade Distributed Lock utility in Node.js with Redis that prevents race conditions, supports an auto-renewing heartbeat lease (watchdog pattern), and safely releases only if the lock is still owned by the caller.",
+    "expectedKeyPoints": [
+      "Acquires lock with SET key uuid NX PX 10000",
+      "Starts background timer (watchdog) renewing PX every 3 seconds while task runs",
+      "Releases lock using atomic Lua script checking if GET key == uuid before DEL",
+      "Guarantees that a long-running job does not lose lock prematurely, and never deletes a lock held by another process if it expired"
+    ],
+    "sampleAnswer": "```javascript\nimport crypto from 'node:crypto';\n\nexport class DistributedLock {\n  constructor(redisClient) {\n    this.redis = redisClient;\n  }\n\n  async acquire(lockKey, ttlMs = 10000) {\n    const lockId = crypto.randomUUID();\n    const acquired = await this.redis.set(lockKey, lockId, 'PX', ttlMs, 'NX');\n    if (!acquired) return null;\n\n    // Start watchdog to renew lease while task executes\n    const renewalInterval = setInterval(async () => {\n      const luaRenew = `\n        if redis.call('get', KEYS[1]) == ARGV[1] then\n          return redis.call('pexpire', KEYS[1], ARGV[2])\n        else\n          return 0\n        end\n      `;\n      await this.redis.eval(luaRenew, 1, lockKey, lockId, ttlMs);\n    }, ttlMs / 3);\n\n    const release = async () => {\n      clearInterval(renewalInterval);\n      const luaRelease = `\n        if redis.call('get', KEYS[1]) == ARGV[1] then\n          return redis.call('del', KEYS[1])\n        else\n          return 0\n        end\n      `;\n      await this.redis.eval(luaRelease, 1, lockKey, lockId);\n    };\n\n    return { lockId, release };\n  }\n}\n```"
+  },
+  {
+    "id": "sr-mongo-16",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Clustered Collections in MongoDB",
+    "question": "What is a 'Clustered Collection' in MongoDB 5.3+, and how does it improve write performance?",
+    "options": [
+      "A) A collection that only works on clustered computers",
+      "B) Documents are physically ordered and stored directly on disk within the clustered index B-Tree (by `_id`), eliminating a separate index and heap storage and avoiding double-writes",
+      "C) A collection that compresses text into images",
+      "D) A collection stored on multiple cloud providers simultaneously"
+    ],
+    "answer": "B",
+    "explanation": "In traditional collections, the index points to separate record store pages. In a Clustered Collection, documents are stored directly in the clustered index nodes, improving write throughput, range scan speeds, and reducing disk footprint."
+  },
+  {
+    "id": "sr-mongo-17",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "mcq",
+    "topic": "Aggregation $facet Memory Limit",
+    "question": "What is the RAM limit for an individual `$facet` stage in MongoDB, and what option must be enabled for large pipelines?",
+    "options": [
+      "A) 16MB limit; must use `$reduce`",
+      "B) 100MB RAM limit; for operations exceeding 100MB, `allowDiskUse: true` must be specified to allow spilling temporary documents to disk",
+      "C) 1GB limit; cannot be changed",
+      "D) Facet has no memory limit"
+    ],
+    "answer": "B",
+    "explanation": "MongoDB limits internal aggregation pipeline stages to 100MB of RAM. If an aggregation (like `$facet` or `$sort`) exceeds 100MB, it aborts unless `{ allowDiskUse: true }` is enabled."
+  },
+  {
+    "id": "sr-mongo-18",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "open",
+    "topic": "Cross-Region Replica Sets with wtimeout",
+    "question": "Why must Write Concerns with `w: 'majority'` always be accompanied by a `wtimeout` parameter in multi-region MongoDB replica sets? Trace what happens when a cross-region fiber link is severed.",
+    "expectedKeyPoints": [
+      "w: 'majority' waits indefinitely by default if majority cannot acknowledge",
+      "If a cross-region partition occurs, writes will block client threads forever without wtimeout",
+      "wtimeout sets a maximum duration; if exceeded, MongoDB returns error but the write may still succeed on the primary (write concern error vs write error)",
+      "Application must handle write concern errors gracefully"
+    ],
+    "sampleAnswer": "1. The Danger of Omitted `wtimeout`:\nWhen `{ w: 'majority' }` is specified without `wtimeout`, the MongoDB driver blocks the application thread indefinitely until a majority of replica set nodes acknowledge the write.\n2. What Happens During a Cross-Region Partition:\nIf two of three nodes are separated across continents by a severed fiber link, the primary in Region A cannot reach the secondaries in Region B. Incoming writes block indefinitely, consuming all Express connection pool threads and freezing the entire application server.\n3. Specifying `wtimeout`:\nAlways specify `{ w: 'majority', wtimeout: 5000 }` (5 seconds). If replication is delayed past 5s, MongoDB returns a Write Concern Error, unblocking the Node.js thread so it can return an HTTP 504 Gateway Timeout or execute fallback logic."
+  },
+  {
+    "id": "sr-mongo-19",
+    "level": "senior",
+    "stack": "mongodb",
+    "type": "open",
+    "topic": "MongoDB Schema Evolution: Outlier and Schema Versioning Patterns",
+    "question": "Describe the 'Outlier Pattern' and 'Schema Versioning Pattern' in enterprise MongoDB systems. How do they handle extreme edge cases (e.g. influencers with 50M followers) and zero-downtime schema evolution?",
+    "expectedKeyPoints": [
+      "Outlier Pattern: Flags documents exceeding standard bounds (has_overflow: true) and offloads overflow data to an overflow collection, keeping 99.9% of documents uniform and fast",
+      "Schema Versioning Pattern: Adds schema_version: 2 to documents; migration logic in application layer transforms v1 documents to v2 dynamically on read/write without massive blocking offline migrations"
+    ],
+    "sampleAnswer": "1. The Outlier Pattern:\nMost users on a social platform have fewer than 1,000 followers, which easily embeds in a document array. However, a celebrity with 50 million followers breaks the 16MB document limit and slows queries.\n- Solution: Add a boolean flag `{ has_overflow: true }`. Normal users have all followers embedded. When followers exceed 1,000, overflow followers are written to a separate `follower_overflow` collection. Queries optimize for the 99.9% normal cases while gracefully handling outliers.\n2. The Schema Versioning Pattern:\nInstead of running a multi-terabyte offline update script that locks collections for days, include a version field `{ schema_version: 2 }` in documents.\n- In the application layer: When reading a document, if `schema_version === 1`, transform the shape in memory. When saving, write it back as version 2. The database migrates organically and continuously with zero downtime."
+  },
+  {
+    "id": "sr-pg-16",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "JIT Compilation Tuning in PostgreSQL",
+    "question": "When should JIT (Just-In-Time) compilation be disabled (`jit = off`) in a high-concurrency PostgreSQL OLTP database?",
+    "options": [
+      "A) When using Ubuntu Linux",
+      "B) For short, fast OLTP queries (like primary key lookups), because JIT compilation adds 5-15ms of planning overhead which can be 10x longer than the actual query execution time",
+      "C) JIT cannot be turned off",
+      "D) Only when running out of RAM"
+    ],
+    "answer": "B",
+    "explanation": "PostgreSQL 12+ enables LLVM JIT compilation by default. While beneficial for long analytical queries (OLAP), for high-concurrency OLTP workloads running in < 2ms, JIT compilation overhead degrades query throughput significantly."
+  },
+  {
+    "id": "sr-pg-17",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "mcq",
+    "topic": "Foreign Data Wrappers (postgres_fdw)",
+    "question": "What capability does PostgreSQL's `postgres_fdw` extension provide?",
+    "options": [
+      "A) It wraps passwords in SHA-256",
+      "B) It allows querying, joining, and updating tables located on remote, separate PostgreSQL servers as if they were local tables within the current database",
+      "C) It translates PostgreSQL queries into MongoDB syntax",
+      "D) It connects PostgreSQL to Redis"
+    ],
+    "answer": "B",
+    "explanation": "`postgres_fdw` implements standard SQL/MED (Management of External Data). You can create foreign servers, user mappings, and query remote database tables directly in joins with local tables."
+  },
+  {
+    "id": "sr-pg-18",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "open",
+    "topic": "Preventing Replication Lag in Physical Streaming Replication",
+    "question": "Explain what causes replication lag in PostgreSQL physical streaming replication and what setting `synchronous_commit = off` does. How do you monitor replication lag (`pg_stat_replication`), and how do you protect read replicas from query cancellation (`hot_standby_feedback`)?",
+    "expectedKeyPoints": [
+      "Causes: High write volume on primary, slow network or disk on standby, long-running queries on standby holding locks",
+      "Monitoring: pg_stat_replication (replay_lag, write_lag, flush_lag)",
+      "hot_standby_feedback: Instructs standby to inform primary of oldest active transaction, preventing primary vacuum from removing rows needed by standby queries",
+      "synchronous_commit = off trades slight durability (last few milliseconds of transactions lost in crash) for dramatically faster write throughput"
+    ],
+    "sampleAnswer": "1. Causes of Replication Lag:\n- Heavy write bursts on the primary exceeding the standby's single-threaded WAL replay capability.\n- Standby query cancellation: If a long query on the standby reads rows that VACUUM on the primary wants to remove, PostgreSQL halts replay or cancels the standby query.\n2. Protection via `hot_standby_feedback`:\nEnabling `hot_standby_feedback = on` instructs the read replica to inform the primary about its oldest running snapshot. The primary delays vacuuming tuples needed by the standby, eliminating query cancellations.\n3. Monitoring:\nInspect `pg_stat_replication` on the primary:\n```sql\nSELECT application_name, client_addr, state, \n       pg_wal_lsn_diff(sent_lsn, replay_lsn) AS bytes_lag,\n       replay_lag\nFROM pg_stat_replication;\n```\n4. `synchronous_commit = off`:\nTransactions return success immediately after writing to WAL buffer in RAM without waiting for an `fsync` to disk. Guarantees zero transaction corruption, though a crash may lose the last ~20ms of committed transactions."
+  },
+  {
+    "id": "sr-pg-19",
+    "level": "senior",
+    "stack": "postgresql",
+    "type": "open",
+    "topic": "PostgreSQL Forensic Audit with pg_stat_statements",
+    "question": "Explain how to configure and utilize `pg_stat_statements` to perform a performance audit of an active PostgreSQL database. Write the SQL query to locate the top 5 queries consuming the most cumulative execution time.",
+    "expectedKeyPoints": [
+      "Configure: shared_preload_libraries = 'pg_stat_statements' in postgresql.conf and CREATE EXTENSION pg_stat_statements",
+      "Query selects query, calls, total_exec_time, mean_exec_time, rows, shared_blks_hit, shared_blks_read",
+      "Orders by total_exec_time DESC limit 5",
+      "Identifies queries that run frequently with low individual cost, or rare queries with massive runtime"
+    ],
+    "sampleAnswer": "```sql\n-- 1. Setup in postgresql.conf:\n-- shared_preload_libraries = 'pg_stat_statements'\n-- CREATE EXTENSION IF NOT EXISTS pg_stat_statements;\n\n-- 2. Top 5 most expensive queries by cumulative CPU/execution time:\nSELECT \n  queryid,\n  substring(query, 1, 100) AS clean_query,\n  calls,\n  round(total_exec_time::numeric, 2) AS total_time_ms,\n  round(mean_exec_time::numeric, 2) AS mean_time_ms,\n  rows,\n  round((100.0 * shared_blks_hit / nullif(shared_blks_hit + shared_blks_read, 0))::numeric, 2) AS cache_hit_pct\nFROM pg_stat_statements\nORDER BY total_exec_time DESC\nLIMIT 5;\n```\nAnalysis: Highlights both high-frequency queries (called 100k times taking 5ms each = 500s cumulative) and unindexed bulk scans, showing exactly where to focus indexing efforts."
+  },
+  {
+    "id": "sr-full-13",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Real-Time Leaderboard with Redis ZSET",
+    "question": "Why are Redis Sorted Sets (`ZSET`) preferred over SQL `ORDER BY score DESC` for real-time leaderboards with 10 million players?",
+    "options": [
+      "A) SQL databases cannot store numbers",
+      "B) Redis Sorted Sets use a SkipList and Hash Map data structure, providing O(log N) score updates (`ZADD`), instant O(1) rank lookups (`ZRANK`), and range queries (`ZREVRANGE`) entirely in RAM, without expensive database sorting locks",
+      "C) Redis Sorted Sets encrypt scores",
+      "D) They do not require a network connection"
+    ],
+    "answer": "B",
+    "explanation": "In PostgreSQL, querying top players requires scanning and sorting millions of rows. Redis Sorted Sets maintain elements in an internal SkipList, guaranteeing O(log N) insertion, update, and rank extraction at microsecond speeds."
+  },
+  {
+    "id": "sr-full-14",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "mcq",
+    "topic": "Multi-Tenant SaaS Database Isolation Models",
+    "question": "Which multi-tenant architecture provides the optimal balance of data isolation, cost efficiency, and operational maintenance for an enterprise SaaS PERN/MERN application?",
+    "options": [
+      "A) Buying a new physical computer for every customer",
+      "B) Shared Database with Shared Schema isolated by PostgreSQL Row-Level Security (RLS) or tenant ID filtering, paired with dedicated databases for ultra-high-tier enterprise customers",
+      "C) Storing all customer data in a single JSON file",
+      "D) Storing data exclusively in client localStorage"
+    ],
+    "answer": "B",
+    "explanation": "A pooled shared database with Row-Level Security delivers the highest resource utilization and lowest operational maintenance for standard tiers, while allowing seamless provisioning of isolated single-tenant databases for VIP enterprise tiers."
+  },
+  {
+    "id": "sr-full-15",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "open",
+    "topic": "Designing an Event-Driven Notification System at Scale",
+    "question": "Architect a resilient, high-volume Notification System (Push, Email, SMS) for a PERN/MERN platform sending 50 million notifications/day. Cover event ingestion (Kafka/RabbitMQ), rate limiting per user, template rendering, and delivery status webhooks.",
+    "expectedKeyPoints": [
+      "Ingestion: Core services publish NotificationRequested event to Apache Kafka partitioned by userId",
+      "Worker pool: Consumer services consume events, check user notification preferences and rate limits (Redis sliding window to prevent spamming)",
+      "Rendering: Distributed template engine renders localized HTML/text",
+      "Dispatch: Dispatches to third-party providers (SendGrid, Twilio, APNs/FCM) using Circuit Breaker and retry with exponential backoff",
+      "Status: Ingests delivery webhooks into PostgreSQL audit log via Outbox pattern"
+    ],
+    "sampleAnswer": "1. Event Ingestion Tier:\nMicroservices emit `NotificationRequested` events to Apache Kafka. Partitioning by `userId` guarantees sequential processing for individual users (e.g. an account verification email is sent before welcome notifications).\n2. Rate Limiting & User Preferences:\nWorkers consume events and check:\n- User notification preferences in Redis.\n- User rate limits using Redis Sliding Window (e.g. max 5 push notifications per hour to avoid spam fatigue).\n3. Rendering Tier:\nStateless Node.js workers compile localized email/push templates with data parameters.\n4. Provider Dispatch Tier (Resilience):\nDispatches to third-party gateways (SendGrid for email, Twilio for SMS, Firebase FCM for push) wrapped in Circuit Breakers (Opossum) with exponential backoff and jitter. Failed deliveries push to a Dead Letter Queue (DLQ).\n5. Ingestion Webhooks & Analytics:\nDelivery callbacks from SendGrid/Twilio hit an Express webhook endpoint, verifying HMAC signatures and updating delivery statuses in PostgreSQL."
+  },
+  {
+    "id": "sr-full-16",
+    "level": "senior",
+    "stack": "fullstack",
+    "type": "open",
+    "topic": "Automated Secret Rotation with HashiCorp Vault in Node.js",
+    "question": "Explain how to architect dynamic, self-rotating database credentials in a Node.js Express service using HashiCorp Vault. How does this eliminate static database passwords in `.env` files and survive credential expiration without service restarts?",
+    "expectedKeyPoints": [
+      "App authenticates with Vault using Kubernetes Service Account or AppRole",
+      "Vault PostgreSQL database secrets engine generates short-lived dynamic DB user credentials (e.g. valid for 1 hour)",
+      "Node service renews lease periodically using Vault SDK",
+      "Before lease expiration, Vault issues new credentials; pg.Pool pool.end() and re-initializes with zero downtime"
+    ],
+    "sampleAnswer": "1. The Problem with Static Credentials:\nStoring static credentials in `.env` or Kubernetes secrets creates major exposure risks: if leaked, attackers maintain permanent database access until manually rotated.\n2. Vault Dynamic Database Credentials Architecture:\n- Authentication: The Node.js pod authenticates to Vault via Kubernetes service account tokens (AppRole).\n- Dynamic Generation: Node requests database credentials from Vault: `vault.read('database/creds/pern-role')`. Vault talks to PostgreSQL and executes: `CREATE ROLE v_user_123 WITH LOGIN PASSWORD 'temp_secret' VALID UNTIL ...`.\n- Leases & Renewal: Credentials are valid for 1 hour. Node runs a background renewal loop (`vault.renew(lease_id)`).\n- Rotation & Pool Refresh: If a credential cannot be renewed or expires, Node fetches fresh credentials from Vault, establishes a new `pg.Pool`, and gracefully drains the old pool without dropping in-flight user requests."
+  }
+]

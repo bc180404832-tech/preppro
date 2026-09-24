@@ -1,0 +1,1306 @@
+#!/usr/bin/env python3
+import json
+
+questions = []
+
+def add_mcq(qid, stack, topic, question, options, answer, explanation):
+    questions.append({
+        "id": qid,
+        "level": "mid",
+        "stack": stack,
+        "type": "mcq",
+        "topic": topic,
+        "question": question,
+        "options": options,
+        "answer": answer,
+        "explanation": explanation
+    })
+
+def add_open(qid, stack, topic, question, expected_key_points, sample_answer):
+    questions.append({
+        "id": qid,
+        "level": "mid",
+        "stack": stack,
+        "type": "open",
+        "topic": topic,
+        "question": question,
+        "expectedKeyPoints": expected_key_points,
+        "sampleAnswer": sample_answer
+    })
+
+# ==================== REACT (MID-LEVEL: 22 Qs) ====================
+add_mcq("mid-react-01", "react", "useCallback vs useMemo",
+    "What is the key technical difference between `useCallback(fn, deps)` and `useMemo(fn, deps)`?",
+    [
+        "A) `useCallback` executes the function immediately, while `useMemo` defers it",
+        "B) `useCallback(fn, deps)` returns a memoized function instance, whereas `useMemo(fn, deps)` invokes the function and returns its memoized result value",
+        "C) `useMemo` is for class components; `useCallback` is for functional components",
+        "D) `useCallback` can only accept synchronous functions, while `useMemo` accepts Promises"
+    ],
+    "B",
+    "`useCallback(fn, deps)` returns a cached reference to the function itself across renders to prevent unnecessary re-renders of memoized child components. `useMemo(() => compute(), deps)` returns the cached return value of the computation."
+)
+
+add_mcq("mid-react-02", "react", "React.memo Shallow Comparison",
+    "By default, how does `React.memo` decide whether to skip re-rendering a component when parent props change?",
+    [
+        "A) It performs a deep recursive comparison of all nested object properties",
+        "B) It performs a shallow comparison (`Object.is`) of previous and next props",
+        "C) It converts props to JSON strings and compares the strings",
+        "D) It only re-renders if the component's internal state changes"
+    ],
+    "B",
+    "`React.memo` performs a shallow reference equality check (`Object.is`) on each prop. If any prop reference changes (such as an inline object `{}` or inline callback `() => {}`), `React.memo` will still trigger a re-render unless a custom comparison function is provided."
+)
+
+add_mcq("mid-react-03", "react", "useReducer vs useState",
+    "When is `useReducer` generally preferred over `useState` in React?",
+    [
+        "A) When the state is a simple primitive boolean or string",
+        "B) When managing complex state transitions where next state depends on previous state, or when multiple sub-values change together according to specific action types",
+        "C) Only when connecting to Redux DevTools",
+        "D) When rendering more than 100 HTML elements"
+    ],
+    "B",
+    "`useReducer` is preferable when state logic is complex, involves multiple sub-values, or when the next state depends on the previous state. It centralizes update logic into a pure reducer function, making testing and debugging easier."
+)
+
+add_mcq("mid-react-04", "react", "useRef for Previous State",
+    "How can `useRef` and `useEffect` be combined to track the previous value of a prop or state variable?",
+    [
+        "A) By mutating `ref.current` during the JSX render phase",
+        "B) By storing the current value in `ref.current` inside `useEffect`, which runs after the render completes, preserving the previous value during the next render",
+        "C) By binding `ref` to the window object",
+        "D) It is impossible; React has a dedicated `usePrevious` built-in hook"
+    ],
+    "B",
+    "Because `useEffect` executes after the render is committed to the screen, reading `ref.current` during rendering yields the value from the previous render, and the effect subsequently updates `ref.current` with the new value for the next cycle."
+)
+
+add_mcq("mid-react-05", "react", "React Context Performance",
+    "What is a common performance pitfall when using React Context for global state management?",
+    [
+        "A) React Context crashes if more than 3 components subscribe to it",
+        "B) Any change to the context value causes all components that call `useContext(MyContext)` to re-render, even if they only consume an untouched property of that context",
+        "C) Context values are serialized to cookies on every render",
+        "D) React Context cannot store functions"
+    ],
+    "B",
+    "React Context does not support selector-based subscriptions natively. When a context value updates, every consumer component re-renders. Splitting contexts or using dedicated state management libraries (Zustand/Redux) prevents unnecessary re-renders."
+)
+
+add_mcq("mid-react-06", "react", "Error Boundaries",
+    "Which of the following lifecycle methods or hooks can be used to create a React Error Boundary?",
+    [
+        "A) `useEffect(() => {}, [error])`",
+        "B) Class component methods: `static getDerivedStateFromError()` and `componentDidCatch()`",
+        "C) `useErrorBoundary()` hook",
+        "D) `try/catch` wrapping the root `<App />` component in index.js"
+    ],
+    "B",
+    "Currently, Error Boundaries must be class components implementing `static getDerivedStateFromError` (to render fallback UI) and/or `componentDidCatch` (to log errors). Hooks do not yet provide an error boundary equivalent."
+)
+
+add_mcq("mid-react-07", "react", "Custom Hooks Abstraction",
+    "What is the primary architectural purpose of writing a Custom Hook in React?",
+    [
+        "A) To run JavaScript in a separate Web Worker thread",
+        "B) To encapsulate and reuse stateful logic and side effects across multiple components without duplicating code or modifying component hierarchy",
+        "C) To create global singleton state shared by all users across the network",
+        "D) To bypass React's Virtual DOM diffing"
+    ],
+    "B",
+    "Custom hooks allow developers to extract component logic into reusable functions. Each component invoking a custom hook gets an isolated instance of the internal state."
+)
+
+add_mcq("mid-react-08", "react", "React Portals",
+    "What is the primary use case for `ReactDOM.createPortal`?",
+    [
+        "A) To render children into a DOM node that exists outside the DOM hierarchy of the parent component (e.g. Modals, Tooltips, Dialogs)",
+        "B) To teleport network requests through a proxy",
+        "C) To serialize components into WebAssembly",
+        "D) To create 3D canvas viewports"
+    ],
+    "A",
+    "Portals allow components like modals, dropdowns, and tooltips to render into `document.body` or other root containers to escape parent CSS stacking contexts (`overflow: hidden` or `z-index` traps) while retaining React event bubbling."
+)
+
+add_mcq("mid-react-09", "react", "React Lazy & Suspense",
+    "How does `React.lazy` combined with `<Suspense>` improve the performance of large PERN/MERN frontends?",
+    [
+        "A) It compresses all PNG images on the fly",
+        "B) It enables dynamic code-splitting by loading component bundles on demand only when they are rendered, displaying a fallback UI while loading",
+        "C) It replaces fetch requests with WebSockets automatically",
+        "D) It converts JavaScript code into C++ binaries"
+    ],
+    "B",
+    "`React.lazy()` dynamically imports components via Webpack/Vite code-splitting, reducing initial bundle size and initial load times. `<Suspense fallback={<Spinner />}>` provides graceful loading states."
+)
+
+add_mcq("mid-react-10", "react", "Stale Closure Problem",
+    "What causes a 'stale closure' bug inside a `useEffect` or `useCallback`?",
+    [
+        "A) Running out of heap memory in Google Chrome",
+        "B) Omitting a state or prop variable from the dependency array, causing the callback to capture and retain an outdated reference from a previous render",
+        "C) Calling `useState` inside a loop",
+        "D) Using async/await inside React components"
+    ],
+    "B",
+    "When a hook callback closes over variables from its render scope but omits them from the dependency array, it continues to reference the snapshot of those variables from when the callback was originally created."
+)
+
+add_mcq("mid-react-11", "react", "Redux Toolkit createSlice",
+    "In Redux Toolkit (RTK), why is it safe to write 'mutating' code like `state.count += 1` inside `createSlice` reducers?",
+    [
+        "A) Redux Toolkit disables immutability checks in production",
+        "B) RTK internally uses the Immer library, which intercepts mutations on a proxy Draft state and produces a new immutable copy",
+        "C) Redux compiles JavaScript into C++ where mutation is faster",
+        "D) Mutating state has always been the standard in Redux"
+    ],
+    "B",
+    "Redux Toolkit uses Immer under the hood. You can write seemingly mutating logic (`state.todos.push(newTodo)`), and Immer records the operations to generate an immutable updated state tree."
+)
+
+add_mcq("mid-react-12", "react", "Zustand State Management",
+    "What is a key architectural advantage of Zustand over React Context for application state?",
+    [
+        "A) Zustand only works on mobile devices",
+        "B) Zustand allows components to subscribe to specific slices of state via selectors, preventing re-renders when unrelated state properties change",
+        "C) Zustand does not support asynchronous actions",
+        "D) Zustand requires wrapping the root component in 10 nested Providers"
+    ],
+    "B",
+    "Zustand provides selector-based subscriptions (`useStore(state => state.user)`), ensuring a component only re-renders when the selected slice changes, completely bypassing Context Provider re-rendering cascades."
+)
+
+add_mcq("mid-react-13", "react", "React 18 useId Hook",
+    "What problem was the `useId()` hook introduced to solve in React 18?",
+    [
+        "A) Generating MongoDB ObjectIds",
+        "B) Generating unique, stable accessibility IDs that match between server-side rendering (SSR) and client-side hydration, avoiding hydration mismatches",
+        "C) Encrypting user passwords in React state",
+        "D) Generating session tokens for JWT auth"
+    ],
+    "B",
+    "`useId` generates unique IDs for accessibility attributes (like `aria-describedby` and `<label htmlFor=...>`) that are guaranteed to match across SSR and client hydration."
+)
+
+add_mcq("mid-react-14", "react", "Compound Component Pattern",
+    "What is the primary benefit of the 'Compound Component' pattern in React (e.g. `<Select><Select.Option /></Select>`)?",
+    [
+        "A) It makes components run faster by compiling to WebAssembly",
+        "B) It provides flexible, declarative UI composition where parent and children share implicit state without prop drilling",
+        "C) It replaces Redux completely",
+        "D) It converts React components into native Web Components"
+    ],
+    "B",
+    "Compound components (popularized by UI libraries like Radix and Headless UI) allow flexible component composition while sharing state internally via React Context."
+)
+
+add_mcq("mid-react-15", "react", "useImperativeHandle Hook",
+    "When should `useImperativeHandle` be used alongside `forwardRef`?",
+    [
+        "A) When you want to trigger re-renders from outside React",
+        "B) When a parent component needs to invoke customized, restricted imperative methods on a child's ref instead of accessing the raw DOM element directly",
+        "C) To bypass the Virtual DOM entirely for canvas games",
+        "D) To define HTTP endpoints inside React components"
+    ],
+    "B",
+    "`useImperativeHandle` customizes the instance value exposed to parent components when using `ref`, exposing only specific methods (e.g., `focus()`, `scrollIntoView()`) rather than full native DOM access."
+)
+
+add_mcq("mid-react-16", "react", "React Synthetic Events Pooling Removal",
+    "In React 17+, how did event delegation change compared to previous versions?",
+    [
+        "A) React stopped using synthetic events and uses raw DOM events exclusively",
+        "B) React attaches event listeners to the root DOM container (`#root`) instead of the `document` node, and synthetic event pooling was completely removed",
+        "C) Event handlers are now evaluated in Web Workers",
+        "D) React only listens to keyboard events"
+    ],
+    "B",
+    "In React 17+, events are attached to the root container node rather than `document`, facilitating micro-frontends with multiple React versions, and event pooling was abolished so event objects persist asynchronously."
+)
+
+add_open("mid-react-17", "react", "Optimizing Re-renders in React",
+    "Explain three effective techniques to diagnose and prevent unnecessary re-renders in a complex React application. Detail the trade-offs of premature memoization.",
+    [
+        "Techniques: React.memo with custom comparison, useCallback/useMemo for stable references, lifting content up / passing JSX as children (composition), Context splitting / Zustand selectors",
+        "Diagnosis: React DevTools Profiler (flamegraph, 'record why component rendered')",
+        "Trade-offs: useMemo and useCallback carry memory overhead, dependency array maintenance, and shallow comparison checks that can exceed the cost of cheap re-renders"
+    ],
+    "1. Diagnostic Tools: Use React DevTools Profiler with 'Record why each component rendered while profiling' enabled to identify components re-rendering unnecessarily.\n2. Prevention Techniques:\n- Component Composition: Moving state down to the component that actually needs it, or passing non-dependent subtrees as `children` props so parent renders don't force child reconciliation.\n- Stable References: Using `useCallback` for event handlers and `useMemo` for expensive computations or object props passed to `React.memo`-wrapped child components.\n- Context Splitting or Atomic State: Splitting large contexts into granular sub-contexts or using Zustand/Jotai so subscribers only listen to specific state slices.\n3. Trade-offs of Premature Memoization: `useMemo` and `useCallback` introduce memory overhead, closure allocations, and dependency array comparison costs. For simple components, running the lightweight render function is faster than maintaining memoization wrappers."
+)
+
+add_open("mid-react-18", "react", "Custom Hook Design Pattern",
+    "Design and explain a custom React hook `useFetch(url, options)` that handles loading state, data caching, error handling, and aborting in-flight requests when the component unmounts or the URL changes.",
+    [
+        "Returns { data, loading, error, refetch }",
+        "Uses AbortController in useEffect cleanup to cancel active HTTP fetch requests",
+        "Handles race conditions when url changes quickly",
+        "Does not call setState after component unmounts"
+    ],
+    "```javascript\nimport { useState, useEffect } from 'react';\n\nexport function useFetch(url, options = {}) {\n  const [data, setData] = useState(null);\n  const [loading, setLoading] = useState(true);\n  const [error, setError] = useState(null);\n\n  useEffect(() => {\n    const controller = new AbortController();\n    setLoading(true);\n    setError(null);\n\n    fetch(url, { ...options, signal: controller.signal })\n      .then(res => {\n        if (!res.ok) throw new Error(`HTTP Error: ${res.status}`);\n        return res.json();\n      })\n      .then(d => setData(d))\n      .catch(err => {\n        if (err.name !== 'AbortError') setError(err.message);\n      })\n      .finally(() => {\n        if (!controller.signal.aborted) setLoading(false);\n      });\n\n    return () => controller.abort(); // Cleanup & abort on URL change or unmount\n  }, [url]);\n\n  return { data, loading, error };\n}\n```\nKey features: Uses `AbortController` to cancel stale in-flight requests, preventing race conditions and memory leaks."
+)
+
+add_open("mid-react-19", "react", "React Router v6 Data Loaders",
+    "How do Loaders and Actions in React Router v6+ shift data fetching architecture away from the traditional `useEffect` fetch-on-render pattern?",
+    [
+        "Fetch-on-render causes 'waterfalls' where child components wait for parents to finish rendering before starting their fetch",
+        "React Router Loaders fetch data in parallel as soon as the URL route matches, before components begin rendering",
+        "Actions provide declarative form submissions and automatic route re-validation"
+    ],
+    "Traditional React apps suffer from 'fetch-on-render waterfalls': Parent renders -> useEffect fetches data -> renders child -> child's useEffect fetches data. This creates sequential latency delays.\nReact Router v6.4+ introduces `loader` functions attached directly to route definitions. When a user navigates to `/dashboard/analytics`, React Router resolves all matching route loaders concurrently before rendering the components. The components then read pre-fetched data via `useLoaderData()`. Form actions work similarly, automatically triggering data re-validation across all active loaders after mutations."
+)
+
+add_open("mid-react-20", "react", "Server State vs Client State (TanStack Query)",
+    "Why is managing server state with tools like TanStack Query (React Query) fundamentally different from managing client state with Redux or Zustand?",
+    [
+        "Server state is remote, asynchronous, shared, potentially out of date (stale), and requires cache invalidation, deduplication, and retry logic",
+        "Client state is local, synchronous, transient (e.g. modals, active tabs, themes)",
+        "TanStack Query handles caching, background re-fetching on window focus, garbage collection, and optimistic updates"
+    ],
+    "Server state represents data stored in a remote database (PostgreSQL/MongoDB). It is asynchronous, outside the client's direct control, and can become stale when other users make updates. Using Redux for server state requires immense boilerplate (loading flags, error states, cache management).\nTools like TanStack Query treat server state as a cache: they handle deduplication, background revalidation on window focus, automatic retries, pagination, and optimistic updates.\nClient state (e.g. isModalOpen, darkTheme, wizard steps) is purely local, synchronous, and UI-driven, which is where Zustand or simple React state shines."
+)
+
+add_open("mid-react-21", "react", "Form Management: React Hook Form vs Controlled",
+    "Contrast building forms with React Hook Form (uncontrolled with refs) versus building forms using traditional `useState` controlled components for a 20-field checkout form.",
+    [
+        "Controlled: Every keystroke updates parent state and re-renders the entire 20-field form, causing input lag on low-end devices",
+        "React Hook Form: Leverages uncontrolled inputs via refs; only the specific field or validation message re-renders, dramatically reducing render count",
+        "Validation integration: React Hook Form integrates natively with schema validators (Zod/Yup)"
+    ],
+    "In a 20-field form with controlled components (`useState`), every single character typed in any input triggers a complete re-render of the form component and its children. On complex forms, this causes noticeable typing lag and frame drops.\nReact Hook Form isolates re-renders by treating inputs as uncontrolled components wired via `useRef`. Subscriptions only trigger renders for fields requiring real-time error display or dirty state. Additionally, it seamlessly plugs into schema validation (Zod, Yup) via resolver middleware, providing high performance and clean validation architecture."
+)
+
+add_open("mid-react-22", "react", "Error Boundaries Implementation and Fallbacks",
+    "Write a production-ready React Error Boundary component in TypeScript or ES6 that renders a custom fallback UI, logs errors to an external monitoring service (like Sentry), and provides a 'Reset / Try Again' button.",
+    [
+        "Class component extending React.Component with state { hasError, error }",
+        "static getDerivedStateFromError(error) to update state for fallback render",
+        "componentDidCatch(error, errorInfo) to report stack trace to monitoring service",
+        "Reset handler that clears state.hasError to allow user recovery"
+    ],
+    "```javascript\nimport React from 'react';\n\nexport class ErrorBoundary extends React.Component {\n  state = { hasError: false, error: null };\n\n  static getDerivedStateFromError(error) {\n    return { hasError: true, error };\n  }\n\n  componentDidCatch(error, errorInfo) {\n    console.error('Unhandled UI Crash:', error, errorInfo);\n    // e.g. Sentry.captureException(error, { extra: errorInfo });\n  }\n\n  handleReset = () => {\n    this.setState({ hasError: false, error: null });\n  };\n\n  render() {\n    if (this.state.hasError) {\n      return (\n        <div className='p-6 bg-red-50 border border-red-200 rounded'>\n          <h2 className='text-red-700 font-bold'>Something went wrong.</h2>\n          <p className='text-sm text-gray-600 my-2'>{this.state.error?.message}</p>\n          <button onClick={this.handleReset} className='px-4 py-2 bg-red-600 text-white rounded'>\n            Try Again\n          </button>\n        </div>\n      );\n    }\n    return this.props.children;\n  }\n}\n```"
+)
+
+# ==================== NODE.JS (MID-LEVEL: 20 Qs) ====================
+add_mcq("mid-node-01", "node", "Event Loop Microtasks vs Macrotasks",
+    "Which queue has highest execution priority immediately after the current call stack completes in Node.js?",
+    [
+        "A) Timers queue (`setTimeout`)",
+        "B) Check queue (`setImmediate`)",
+        "C) `process.nextTick` queue, followed by the Promise microtask queue",
+        "D) Poll queue (I/O callbacks)"
+    ],
+    "C",
+    "In Node.js, `process.nextTick` queue executes immediately when the JavaScript call stack unwinds, even before Promise microtasks. Microtasks execute before the event loop advances to the next phase."
+)
+
+add_mcq("mid-node-02", "node", "setImmediate vs setTimeout(0)",
+    "In a regular I/O callback cycle, which executes first between `setImmediate()` and `setTimeout(fn, 0)`?",
+    [
+        "A) `setTimeout(fn, 0)` always executes first",
+        "B) `setImmediate()` always executes first because the check phase immediately follows the poll phase",
+        "C) They execute in random order every single time",
+        "D) Neither executes because I/O callbacks block timers"
+    ],
+    "B",
+    "When scheduled within an I/O cycle (such as `fs.readFile` callback), the poll phase is active. The event loop moves directly from poll to the check phase, guaranteeing that `setImmediate()` executes before any timers."
+)
+
+add_mcq("mid-node-03", "node", "Streams & Backpressure",
+    "What is 'backpressure' in Node.js Streams and how is it handled?",
+    [
+        "A) When CPU temperature rises above 90°C",
+        "B) When a readable stream produces data faster than the writable stream can consume it, requiring pausing the readable stream until the writable buffer drains",
+        "C) When network latency drops to zero",
+        "D) A MongoDB indexing error"
+    ],
+    "B",
+    "Backpressure occurs when data writes buffer up because the destination is slower than the source. When `writable.write()` returns `false`, reading should pause until the writable emits the `'drain'` event. `stream.pipeline` handles this automatically."
+)
+
+add_mcq("mid-node-04", "node", "stream.pipeline vs .pipe()",
+    "Why is `stream.pipeline()` preferred over standard `.pipe()` in production Node.js applications?",
+    [
+        "A) `.pipe()` does not support binary data",
+        "B) `.pipe()` does not automatically forward errors or destroy streams if one stream in the chain fails, causing memory and descriptor leaks",
+        "C) `stream.pipeline()` is a third-party module",
+        "D) `.pipe()` was removed in Node.js 14"
+    ],
+    "B",
+    "`pipeline()` forwards errors across all chained streams, properly cleans up and destroys streams upon errors or completion, and accepts a callback or returns a Promise, unlike `.pipe()` which leaves streams unclosed on errors."
+)
+
+add_mcq("mid-node-05", "node", "EventEmitter Memory Leaks",
+    "What warning does Node.js emit if you register more than 10 listeners on a single `EventEmitter` without modifying limits?",
+    [
+        "A) `FatalError: StackOverflowException`",
+        "B) `MaxListenersExceededWarning: Possible EventEmitter memory leak detected`",
+        "C) `SecurityWarning: DOS attack detected`",
+        "D) Node.js silently discards the 11th listener"
+    ],
+    "B",
+    "Node.js sets a default safety limit of 10 listeners per event to help developers catch memory leaks (such as repeatedly adding event listeners without removing them). You can adjust it with `emitter.setMaxListeners(n)`."
+)
+
+add_mcq("mid-node-06", "node", "Child Process exec vs spawn",
+    "What is the key operational difference between `child_process.exec` and `child_process.spawn`?",
+    [
+        "A) `exec` spawns a shell and buffers the entire output in memory, while `spawn` streams data via I/O streams without buffering the entire output",
+        "B) `spawn` only works on Linux; `exec` works on Windows",
+        "C) `exec` is non-blocking, while `spawn` is blocking",
+        "D) `spawn` can only run Python scripts"
+    ],
+    "A",
+    "`exec` buffers stdout/stderr up to a configured limit (default 1MB) and passes the final string to a callback. `spawn` returns stream handles (`stdout`, `stderr`), making it suitable for large data outputs or long-running processes."
+)
+
+add_mcq("mid-node-07", "node", "Crypto Random Bytes",
+    "Which method should be used in Node.js to generate cryptographically secure random tokens for password resets?",
+    [
+        "A) `Math.random().toString(36)`",
+        "B) `crypto.randomBytes(32)` or `crypto.randomUUID()`",
+        "C) `Date.now().toString()`",
+        "D) `Buffer.alloc(32)`"
+    ],
+    "B",
+    "`Math.random()` uses a pseudo-random number generator (PRNG) that is predictable. For security-sensitive tokens, you must use the cryptographically secure CSPRNG provided by `crypto.randomBytes()`."
+)
+
+add_mcq("mid-node-08", "node", "Unhandled Promise Rejections",
+    "What happens in modern Node.js (v16+) when an unhandled Promise rejection occurs and no listener is attached?",
+    [
+        "A) The promise is automatically retried 3 times",
+        "B) The Node.js process terminates immediately with a non-zero exit code",
+        "C) The error is printed as a subtle warning and the process continues indefinitely",
+        "D) Node.js rolls back all database queries"
+    ],
+    "B",
+    "Starting in Node.js 15+, unhandled rejections terminate the Node process with exit code 1 (`--unhandled-rejections=throw`), preventing processes from running in unpredictable corrupted states."
+)
+
+add_mcq("mid-node-09", "node", "Buffer vs String Memory",
+    "Why does reading a 500MB video file into a `Buffer` consume less overhead than reading it into a JavaScript `String`?",
+    [
+        "A) Strings in V8 are stored in UTF-16 (requiring up to 2 bytes per character) and are garbage collected within the V8 heap limits, whereas Buffers allocate raw binary memory outside the V8 heap",
+        "B) Buffers use hardware compression",
+        "C) Strings cannot exceed 10MB in V8",
+        "D) Node.js automatically swaps Buffers to disk"
+    ],
+    "A",
+    "Buffers are allocated directly in C++ memory outside the V8 JavaScript heap. Converting binary data to JavaScript strings incurs UTF-16 encoding expansion and stresses V8 garbage collection."
+)
+
+add_mcq("mid-node-10", "node", "Node.js Cluster Module",
+    "How does the built-in `cluster` module in Node.js scale an Express application across multi-core processors?",
+    [
+        "A) It executes JavaScript in multiple threads inside the same V8 engine",
+        "B) It forks multiple child processes that share the same server port, using a round-robin scheduling algorithm in the master process to distribute connections",
+        "C) It replicates the database across the network",
+        "D) It offloads HTTP handling to the GPU"
+    ],
+    "B",
+    "The `cluster` module allows master processes to fork worker processes (one per CPU core). On POSIX systems, the master process listens on the port and accepts incoming connections, distributing them to workers via round-robin."
+)
+
+add_mcq("mid-node-11", "node", "UV_THREADPOOL_SIZE",
+    "Which tasks in Node.js rely on the internal libuv thread pool (controlled by `UV_THREADPOOL_SIZE`, default 4)?",
+    [
+        "A) Network TCP sockets and HTTP requests",
+        "B) File system operations (`fs`), `crypto` operations (like `pbkdf2`), compression (`zlib`), and `dns.lookup`",
+        "C) Array sorting and JSON parsing",
+        "D) React server rendering"
+    ],
+    "B",
+    "Network I/O utilizes non-blocking OS kernel primitives (epoll/kqueue). However, file I/O, heavy cryptographic hashing, zlib compression, and blocking DNS lookups are offloaded to libuv's C thread pool."
+)
+
+add_mcq("mid-node-12", "node", "Transform Streams",
+    "What is a `Transform` stream in Node.js?",
+    [
+        "A) A stream that converts CommonJS to ES Modules",
+        "B) A Duplex stream where the output is computed based on the input (e.g. `zlib.createGzip()` or encryption cipher streams)",
+        "C) A stream that converts SQL to MongoDB",
+        "D) A stream that operates only in memory without data flow"
+    ],
+    "B",
+    "A `Transform` stream is a Duplex stream that modifies or transforms data as it is written and read. Examples include gzip compression, string uppercase transformations, and cryptographic ciphers."
+)
+
+add_mcq("mid-node-13", "node", "DNS Lookup vs Resolve",
+    "What is the difference between `dns.lookup()` and `dns.resolve()` in Node.js?",
+    [
+        "A) `dns.lookup` uses the synchronous OS `getaddrinfo(3)` call on the libuv threadpool; `dns.resolve` queries DNS servers directly over the network asynchronously without using the thread pool",
+        "B) `dns.resolve` only works for IPv6",
+        "C) `dns.lookup` is deprecated in Node.js 18",
+        "D) There is no difference"
+    ],
+    "A",
+    "`dns.lookup()` invokes the operating system's `getaddrinfo` via the libuv thread pool (respecting `/etc/hosts`). Heavy lookup traffic can exhaust the 4-thread pool. `dns.resolve()` connects directly over the network via C-Ares without thread pool overhead."
+)
+
+add_mcq("mid-node-14", "node", "Graceful Shutdown Signals",
+    "Which operating system signals should a production Node.js service intercept to perform a graceful shutdown?",
+    [
+        "A) `SIGKILL` and `SIGSTOP`",
+        "B) `SIGTERM` (sent by Kubernetes/Docker to stop container) and `SIGINT` (Ctrl+C)",
+        "C) `SIGSEGV` and `SIGBUS`",
+        "D) `SIGHUP` only"
+    ],
+    "B",
+    "`SIGTERM` is the standard termination signal sent by container orchestrators (Kubernetes, Docker) giving the process time to finish active requests. `SIGKILL` cannot be caught or handled."
+)
+
+add_open("mid-node-15", "node", "Deep Dive into Node.js Event Loop",
+    "Describe the 6 phases of the libuv Event Loop in Node.js in exact order. Explain where microtasks (`process.nextTick` and Promises) execute relative to these phases.",
+    [
+        "Order: 1. Timers -> 2. Pending I/O callbacks -> 3. Idle, prepare -> 4. Poll -> 5. Check -> 6. Close callbacks",
+        "Timers: setTimeout, setInterval",
+        "Poll: checks for I/O events, executes I/O callbacks",
+        "Check: setImmediate callbacks",
+        "Microtasks: process.nextTick and Promise callbacks execute between every phase transition and whenever the call stack clears"
+    ],
+    "The Node.js event loop runs via libuv across 6 distinct phases in each tick:\n1. Timers: Executes callbacks scheduled by `setTimeout()` and `setInterval()` whose thresholds have passed.\n2. Pending Callbacks: Executes I/O callbacks deferred from the previous iteration (e.g., system-level errors like ECONNREFUSED).\n3. Idle, Prepare: Internal libuv operations.\n4. Poll: Calculates how long to block and poll for I/O; retrieves and executes incoming I/O events (network, disk reads).\n5. Check: Executes `setImmediate()` callbacks immediately after the poll phase finishes.\n6. Close Callbacks: Executes close event handlers (e.g. `socket.on('close')`).\nMicrotask Priority: The `process.nextTick` queue and Promise microtask queue run immediately after the current operation finishes on the call stack and between transitions between each of these phases."
+)
+
+add_open("mid-node-16", "node", "Handling CPU-Intensive Tasks in Node.js",
+    "Because Node.js runs on a single main thread, a synchronous heavy calculation (e.g., image resizing or complex hashing) blocks the event loop. Describe three architectural strategies to handle CPU-bound workloads in a Node.js backend without blocking HTTP traffic.",
+    [
+        "Worker Threads (worker_threads module): Run CPU-intensive JavaScript in parallel threads sharing memory (SharedArrayBuffer)",
+        "Child Processes (child_process.fork / spawn): Offload to separate OS processes",
+        "External Background Job Queue: Offload to Redis-backed queues (BullMQ, Celery, RabbitMQ) consumed by dedicated worker services",
+        "Offloading to native C++ addons or microservices"
+    ],
+    "1. Worker Threads (`worker_threads`): Introduced to execute CPU-bound JavaScript concurrently in separate OS threads with isolated V8 engines, communicating via message passing or `SharedArrayBuffer` without blocking the main event loop.\n2. Child Processes (`child_process.fork()`): Spawns separate Node.js processes with dedicated memory spaces, utilizing IPC (Inter-Process Communication) to exchange tasks and results.\n3. Background Task Queues (e.g. BullMQ with Redis): Offload heavy operations to an asynchronous queue. The Express API immediately responds with an HTTP 202 Accepted and job ID, while dedicated worker instances process jobs off-thread."
+)
+
+add_open("mid-node-17", "node", "Production Graceful Shutdown Implementation",
+    "Write a production graceful shutdown handler for an Express + PostgreSQL/MongoDB server in Node.js that stops accepting new connections, drains existing HTTP requests, closes database connection pools, and exits cleanly within a 10-second timeout.",
+    [
+        "Listens for SIGTERM and SIGINT",
+        "Calls server.close() to stop receiving new HTTP requests",
+        "Closes DB connections (pool.end() or mongoose.connection.close())",
+        "Enforces a hard timeout (e.g. setTimeout(..., 10000).unref()) to force exit if requests hang"
+    ],
+    "```javascript\nfunction setupGracefulShutdown(server, db) {\n  const shutdown = async (signal) => {\n    console.log(`Received ${signal}. Starting graceful shutdown...`);\n    \n    // 1. Force kill process if cleanup hangs beyond 10 seconds\n    const forceTimeout = setTimeout(() => {\n      console.error('Graceful shutdown timed out. Forcing exit.');\n      process.exit(1);\n    }, 10000);\n    forceTimeout.unref();\n\n    // 2. Stop accepting new incoming HTTP connections\n    server.close(async () => {\n      console.log('HTTP server closed.');\n      try {\n        // 3. Drain database connections\n        await db.close(); // e.g. mongoose.connection.close() or pool.end()\n        console.log('Database connections closed cleanly.');\n        process.exit(0);\n      } catch (err) {\n        console.error('Error during database teardown:', err);\n        process.exit(1);\n      }\n    });\n  };\n\n  process.on('SIGTERM', () => shutdown('SIGTERM'));\n  process.on('SIGINT', () => shutdown('SIGINT'));\n}\n```"
+)
+
+add_open("mid-node-18", "node", "Memory Leaks in Node.js: Causes and Remedies",
+    "Explain three common causes of memory leaks in Node.js applications and the diagnostic approach to isolate them using heap snapshots.",
+    [
+        "Causes: Unbounded global caches/maps without eviction, forgotten event listeners or intervals, closures retaining large scope variables",
+        "Diagnosis: Take heap snapshots using Chrome DevTools or heapdump module, compare snapshots over time, inspect Shallow Size vs Retained Size"
+    ],
+    "Common Causes:\n1. Unbounded In-Memory Caches: Storing user objects or request tokens in a global JavaScript `Map` or array without size limits or TTL expiration.\n2. Lingering Event Listeners: Registering event handlers on persistent objects (`socket.on('data', ...)`) without removing them upon client disconnect.\n3. Unintentional Closures: Inner functions capturing large variables or buffers in their outer scope, preventing garbage collection.\nDiagnostics:\nRun Node with `--inspect` and connect Chrome DevTools (`chrome://inspect`). Take an initial Heap Snapshot, put the server under load with `autocannon`, and take a second snapshot. Compare snapshots using the 'Objects allocated between snapshots' view, sorting by 'Retained Size' to locate the root retaining path."
+)
+
+add_open("mid-node-19", "node", "Stream Pipeline Implementation",
+    "Write a Node.js utility function that streams a 2GB CSV file from disk, decompresses it with Gzip, filters rows where column 3 is 'active', and writes the result to a new file using `stream.pipeline`.",
+    [
+        "Uses fs.createReadStream and fs.createWriteStream",
+        "Uses zlib.createGunzip() for decompression",
+        "Uses Transform stream to process chunks/lines",
+        "Wraps in stream.pipeline with async/await (stream/promises)"
+    ],
+    "```javascript\nimport { pipeline } from 'stream/promises';\nimport fs from 'fs';\nimport zlib from 'zlib';\nimport { Transform } from 'stream';\n\nexport async function filterActiveRows(sourceGzPath, targetPath) {\n  const rowFilter = new Transform({\n    transform(chunk, encoding, callback) {\n      const lines = chunk.toString().split('\\n');\n      const filtered = lines.filter(line => line.includes(',active,')).join('\\n');\n      this.push(filtered + '\\n');\n      callback();\n    }\n  });\n\n  await pipeline(\n    fs.createReadStream(sourceGzPath),\n    zlib.createGunzip(),\n    rowFilter,\n    fs.createWriteStream(targetPath)\n  );\n  console.log('Stream pipeline completed with zero memory exhaustion.');\n}\n```"
+)
+
+add_open("mid-node-20", "node", "Worker Threads vs Cluster",
+    "Compare Node.js Worker Threads (`worker_threads`) and the Cluster module (`cluster`). When should an architect select Worker Threads versus Cluster?",
+    [
+        "Cluster: Spawns independent OS processes with isolated memory heaps, ideal for distributing I/O-bound web traffic across CPU cores",
+        "Worker Threads: Run within the same process sharing the process memory space, ideal for CPU-bound computations (image processing, crypto, ML)",
+        "Memory: Workers can share memory via SharedArrayBuffer; Cluster processes cannot share memory directly (requires Redis/IPC)"
+    ],
+    "- Cluster Module:\n  - Architecture: Creates multiple separate Node.js processes, each with its own V8 instance, event loop, and memory heap.\n  - Best for: Web server scaling (horizontal scaling on a single machine). Perfect for distributing incoming HTTP requests across all CPU cores.\n  - Memory: Independent; inter-process communication (IPC) requires serialization.\n- Worker Threads:\n  - Architecture: Creates lightweight threads within the *same* process, sharing memory space.\n  - Best for: Heavy CPU-bound calculations (e.g., resizing images, parsing massive JSON files, machine learning inferences, video encoding).\n  - Memory: Can share raw binary data directly with zero copy using `SharedArrayBuffer` and `Atomics`."
+)
+
+# ==================== EXPRESS.JS (MID-LEVEL: 18 Qs) ====================
+add_mcq("mid-express-01", "express", "Helmet Middleware",
+    "What security protections does the `helmet` middleware package provide for Express?",
+    [
+        "A) It stops SQL injections by escaping queries",
+        "B) It automatically sets secure HTTP response headers (Content-Security-Policy, X-Frame-Options, Strict-Transport-Security, X-Content-Type-Options) to protect against common web vulnerabilities",
+        "C) It encrypts the hard drive",
+        "D) It generates SSL certificates"
+    ],
+    "B",
+    "`helmet()` is a collection of middleware functions that set critical HTTP security headers, mitigating attacks like clickjacking (`X-Frame-Options`), MIME sniffing (`X-Content-Type-Options`), and enforcing HTTPS (`HSTS`)."
+)
+
+add_mcq("mid-express-02", "express", "Multer Storage Engines",
+    "What is the difference between `multer.memoryStorage()` and `multer.diskStorage()`?",
+    [
+        "A) `memoryStorage` stores files in MongoDB; `diskStorage` stores them in PostgreSQL",
+        "B) `memoryStorage` buffers the uploaded file in RAM as a Buffer, while `diskStorage` streams the file directly to the local filesystem",
+        "C) `diskStorage` only works on Windows",
+        "D) `memoryStorage` encrypts files with AES-256"
+    ],
+    "B",
+    "`memoryStorage` is convenient when uploading directly to cloud storage (like AWS S3) via buffers, but large files can exhaust server RAM. `diskStorage` saves files to specified directories on disk, saving memory."
+)
+
+add_mcq("mid-express-03", "express", "express-rate-limit",
+    "How does `express-rate-limit` help protect an Express authentication endpoint (e.g. `/api/auth/login`)?",
+    [
+        "A) It prevents invalid passwords from being submitted",
+        "B) It limits repeated requests from the same IP within a defined timeframe, preventing brute-force password guessing and DoS floods",
+        "C) It hides the server IP address behind Tor",
+        "D) It verifies reCAPTCHA tokens automatically"
+    ],
+    "B",
+    "Rate limiting caps the number of requests an IP address can make in a given time window (e.g. 5 attempts per 15 minutes for `/login`), defeating brute-force credential stuffing."
+)
+
+add_mcq("mid-express-04", "express", "Signed Cookies",
+    "In Express using `cookie-parser('secret')`, what does a signed cookie provide?",
+    [
+        "A) Complete encryption so the client cannot see the contents",
+        "B) Cryptographic HMAC signature verification to detect if the client tampered with or modified the cookie value",
+        "C) Automatic renewal of expired cookies",
+        "D) Prevention of cookie theft via XSS"
+    ],
+    "B",
+    "Signed cookies are not encrypted (the user can still read the string), but they contain a cryptographic HMAC hash. If the user alters the cookie value, Express detects the signature mismatch and invalidates it."
+)
+
+add_mcq("mid-express-05", "express", "Async Error Handling in Express 4 vs 5",
+    "In Express 4, what happens if an unhandled promise rejection occurs inside an `async (req, res)` handler without a try/catch or wrapper?",
+    [
+        "A) Express automatically catches the error and sends a 500 response",
+        "B) The request hangs indefinitely until timeout, and Node emits an unhandledRejection event",
+        "C) Express re-runs the route handler",
+        "D) The server deletes the route"
+    ],
+    "B",
+    "Express 4 does not automatically catch rejected promises in async middleware; errors must be passed via `next(err)`. (Express 5 natively catches rejected promises)."
+)
+
+add_mcq("mid-express-06", "express", "Content-Type Negotiation",
+    "Which Express method allows a route handler to send different response formats (HTML, JSON, Text) based on the client's `Accept` HTTP header?",
+    [
+        "A) `res.send()`",
+        "B) `res.format()`",
+        "C) `res.negotiate()`",
+        "D) `res.type()`"
+    ],
+    "B",
+    "`res.format({ 'text/plain': ..., 'text/html': ..., 'application/json': ... })` performs content negotiation using the `Accept` request header."
+)
+
+add_mcq("mid-express-07", "express", "CORS Credentials Header",
+    "When a React frontend sends requests with `credentials: 'include'` (cookies/auth headers), what value is FORBIDDEN for `Access-Control-Allow-Origin` on the server?",
+    [
+        "A) The exact origin e.g. `http://localhost:3000`",
+        "B) The wildcard asterisk `*`",
+        "C) `null`",
+        "D) HTTPS domains"
+    ],
+    "B",
+    "The CORS specification strictly forbids the wildcard `*` when `Access-Control-Allow-Credentials: true` is set. The server must echo back the specific requesting origin."
+)
+
+add_mcq("mid-express-08", "express", "Compression Middleware",
+    "What does the `compression` middleware in Express do?",
+    [
+        "A) Compresses the database tables on disk",
+        "B) Gzips or Brotli-compresses HTTP response bodies for clients that send supported `Accept-Encoding` headers, reducing bandwidth",
+        "C) Minimizes JavaScript code in production",
+        "D) Compresses image uploads"
+    ],
+    "B",
+    "`compression()` inspects client `Accept-Encoding` headers and automatically compresses outbound JSON/HTML responses (gzip/deflate), cutting network payloads by up to 70%."
+)
+
+add_mcq("mid-express-09", "express", "ETags in Express",
+    "How does Express utilize the `ETag` HTTP response header for caching?",
+    [
+        "A) It encrypts user sessions",
+        "B) It generates a hash of the response body; if the client sends `If-None-Match` with a matching hash, Express returns `304 Not Modified` with an empty body",
+        "C) It counts how many times an API was visited",
+        "D) It sets cookie expiration"
+    ],
+    "B",
+    "Express automatically generates ETags for responses. If the client has cached the payload, Express responds with HTTP 304, saving bandwidth by avoiding redundant payload transfers."
+)
+
+add_mcq("mid-express-10", "express", "Testing with Supertest",
+    "Why is `supertest` widely used for testing Express route handlers?",
+    [
+        "A) It automatically writes unit tests using AI",
+        "B) It allows testing HTTP requests against Express apps programmatically without needing to start a real listening TCP server on a network port",
+        "C) It monitors server RAM in production",
+        "D) It mocks PostgreSQL queries"
+    ],
+    "B",
+    "`supertest` invokes the Express application instance directly via internal Node HTTP request objects, enabling fast, isolated integration tests without managing port bindings."
+)
+
+add_mcq("mid-express-11", "express", "res.locals vs req.session",
+    "What is the lifecycle and scope of properties assigned to `res.locals` in Express?",
+    [
+        "A) They persist forever in localStorage",
+        "B) They are scoped strictly to the current request-response lifecycle and accessible across all subsequent middleware and rendering views for that single request",
+        "C) They are shared across all users globally",
+        "D) They are saved to MongoDB"
+    ],
+    "B",
+    "`res.locals` is an object scoped to the lifetime of that specific request. It is ideal for passing user identity, timestamps, or request-specific flags across middleware functions."
+)
+
+add_mcq("mid-express-12", "express", "Sub-App Mounting",
+    "What is the behavior of mounting a sub-application with `app.use('/admin', adminApp)` in Express?",
+    [
+        "A) It launches a second Node.js process",
+        "B) It mounts the `adminApp` at the `/admin` prefix, where the sub-app has its own routing and settings while inheriting parent middleware",
+        "C) It requires an admin password to deploy",
+        "D) It creates a separate database"
+    ],
+    "B",
+    "Express applications can be nested inside other Express applications using `app.use(mountPath, subApp)`, providing clean isolation for admin panels or versioned APIs."
+)
+
+add_open("mid-express-13", "express", "Role-Based Access Control (RBAC) Middleware",
+    "Write an Express middleware function `authorize(...allowedRoles)` that checks whether an authenticated user has the necessary role (e.g. 'admin', 'editor') and returns a 403 status code if not.",
+    [
+        "Returns a middleware function (closure)",
+        "Checks req.user and req.user.role",
+        "Returns 401 if unauthenticated, 403 if role not included in allowedRoles",
+        "Calls next() if role is valid"
+    ],
+    "```javascript\nexport const authorize = (...allowedRoles) => {\n  return (req, res, next) => {\n    if (!req.user) {\n      return res.status(401).json({ message: 'Authentication required' });\n    }\n    if (!allowedRoles.includes(req.user.role)) {\n      return res.status(403).json({\n        message: `Forbidden: Requires one of [${allowedRoles.join(', ')}] permissions`\n      });\n    }\n    next();\n  };\n};\n\n// Usage:\n// app.delete('/api/users/:id', authenticate, authorize('admin', 'superadmin'), deleteUserHandler);\n```"
+)
+
+add_open("mid-express-14", "express", "Request Validation with Schema Libraries (Zod / Joi)",
+    "Explain why input validation should occur at the middleware boundary using libraries like Zod or Joi, and write a sample validation middleware for a user registration payload.",
+    [
+        "Validates req.body, req.query, or req.params before business logic executes",
+        "Prevents SQL/NoSQL injection, unexpected types, and schema pollution",
+        "Returns structured 400 Bad Request with field-specific validation errors"
+    ],
+    "Validating inputs at the middleware boundary ensures invalid or malicious payloads are rejected before reaching database queries or business controllers:\n```javascript\nimport { z } from 'zod';\n\nconst registerSchema = z.object({\n  email: z.string().email(),\n  password: z.string().min(8).regex(/[A-Z]/, 'Must contain uppercase letter'),\n  age: z.number().int().positive().optional()\n});\n\nexport const validate = (schema) => (req, res, next) => {\n  const result = schema.safeParse(req.body);\n  if (!result.success) {\n    return res.status(400).json({\n      error: 'Validation failed',\n      issues: result.error.errors.map(e => ({ field: e.path.join('.'), message: e.message }))\n    });\n  }\n  req.validatedBody = result.data;\n  next();\n};\n```"
+)
+
+add_open("mid-express-15", "express", "Handling Multipart File Uploads Securely",
+    "Describe the security vulnerabilities associated with file uploads in Express (e.g. executable uploads, path traversal, zip bombs) and how to mitigate them using Multer configuration and magic byte validation.",
+    [
+        "File size limits to prevent DoS (limits: { fileSize: 5 * 1024 * 1024 })",
+        "MIME type and file extension verification (fileFilter)",
+        "Never trust client-supplied filenames (generate random UUIDs for storage)",
+        "Validate magic bytes using file-type library (not just Content-Type header)",
+        "Store files outside web root or upload directly to cloud S3/GCS bucket"
+    ],
+    "Security Risks:\n1. Execution Attacks: Attackers upload malicious scripts (e.g. `.php`, `.js`) that execute if served from public root.\n2. DoS / Disk Flooding: Uploading gigantic files to exhaust server storage.\n3. Spoofed MIME Types: Renaming `malware.exe` to `image.png`.\nMitigations:\n1. Multer Limits: Enforce strict byte limits: `limits: { fileSize: 5 * 1024 * 1024 }`.\n2. Renaming: Never use `file.originalname` directly; store as random UUIDs (`crypto.randomUUID() + ext`).\n3. Magic Byte Inspection: Inspect the initial binary bytes using libraries like `file-type` to verify actual image headers rather than trusting `req.headers['content-type']`.\n4. Offload Storage: Stream uploads to AWS S3 / Cloudflare R2 rather than saving directly to the application server's local disk."
+)
+
+add_open("mid-express-16", "express", "Async Error Handling Wrapper",
+    "Write an `asyncHandler` higher-order utility function for Express 4 that wraps asynchronous controllers and automatically catches rejections, forwarding them to `next(err)` without repetitive try/catch blocks.",
+    [
+        "Takes (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)",
+        "Eliminates boilerplate try/catch blocks in every controller",
+        "Ensures unhandled promise rejections are piped to centralized error middleware"
+    ],
+    "```javascript\nexport const asyncHandler = (fn) => {\n  return (req, res, next) => {\n    Promise.resolve(fn(req, res, next)).catch(next);\n  };\n};\n\n// Usage in controllers:\n// router.get('/users', asyncHandler(async (req, res) => {\n//   const users = await User.find();\n//   res.json(users);\n// }));\n```\nThis higher-order function guarantees that any rejected promise or throw inside the async handler is intercepted and forwarded to Express's `next(err)` centralized error pipeline."
+)
+
+add_open("mid-express-17", "express", "CORS Architecture and Preflight Requests",
+    "Explain what triggers an HTTP CORS preflight (`OPTIONS`) request in the browser. Which headers are exchanged, and how should Express respond?",
+    [
+        "Triggers: Non-simple HTTP methods (PUT, DELETE, PATCH) or custom headers (Authorization, X-Custom) or Content-Type other than application/x-www-form-urlencoded, multipart/form-data, text/plain",
+        "Browser sends OPTIONS with Origin, Access-Control-Request-Method, Access-Control-Request-Headers",
+        "Server responds with Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Max-Age"
+    ],
+    "A Preflight (`OPTIONS`) request is an automatic probe sent by the browser before the actual request when the request is not 'simple'.\nTriggers include:\n- Methods other than GET, HEAD, or POST (e.g. PUT, PATCH, DELETE)\n- Custom request headers like `Authorization` or `X-Api-Key`\n- `Content-Type` set to `application/json`.\nThe browser sends headers: `Origin`, `Access-Control-Request-Method`, and `Access-Control-Request-Headers`.\nThe Express server responds with:\n- `Access-Control-Allow-Origin: https://app.example.com`\n- `Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS`\n- `Access-Control-Allow-Headers: Content-Type, Authorization`\n- `Access-Control-Max-Age: 86400` (caches preflight result to prevent repetitive round-trips)."
+)
+
+add_open("mid-express-18", "express", "Standardized RESTful Response Format",
+    "Design a centralized response formatter middleware or utility in Express that ensures all success and error responses adhere to a consistent JSON envelope schema across the API.",
+    [
+        "Envelope structure: { success: boolean, data?: any, error?: { code, message, details }, meta?: { page, limit, total } }",
+        "Consistent HTTP status codes matching envelope state",
+        "Prevents leaking stack traces in production while enabling rich debugging in development"
+    ],
+    "```javascript\nexport const responseEnvelope = (req, res, next) => {\n  res.success = (data, statusCode = 200, meta = null) => {\n    res.status(statusCode).json({\n      success: true,\n      data,\n      ...(meta && { meta })\n    });\n  };\n\n  res.fail = (message, statusCode = 400, details = null) => {\n    res.status(statusCode).json({\n      success: false,\n      error: {\n        message,\n        statusCode,\n        ...(details && { details })\n      }\n    });\n  };\n\n  next();\n};\n```"
+)
+
+# ==================== MONGODB & MONGOOSE (MID-LEVEL: 18 Qs) ====================
+add_mcq("mid-mongo-01", "mongodb", "Aggregation Pipeline Stages",
+    "Which aggregation pipeline stage is used to perform an equality join with another collection in MongoDB?",
+    [
+        "A) `$join`",
+        "B) `$lookup`",
+        "C) `$merge`",
+        "D) `$combine`"
+    ],
+    "B",
+    "`$lookup` performs a left outer join to an unsharded collection in the same database, allowing you to pull matching documents into an array field."
+)
+
+add_mcq("mid-mongo-02", "mongodb", "Compound Indexes & ESR Rule",
+    "What does the 'ESR Rule' stand for when ordering keys in a MongoDB compound index?",
+    [
+        "A) Execution, Sorting, Redundancy",
+        "B) Equality, Sort, Range",
+        "C) Embedded, Sharded, Replicated",
+        "D) Expression, Structure, Record"
+    ],
+    "B",
+    "The ESR rule specifies optimal compound index order: 1. Equality fields first (exact matches), 2. Sort fields second (determines sort order without in-memory sort), 3. Range fields last (filters with `$gt`, `$lt`)."
+)
+
+add_mcq("mid-mongo-03", "mongodb", "COLLSCAN vs IXSCAN",
+    "In a MongoDB `explain('executionStats')` report, what does `COLLSCAN` signify and why is it problematic for large collections?",
+    [
+        "A) Collection Scan: MongoDB had to inspect every single document in the collection because no suitable index was available",
+        "B) Collision Scan: Multiple documents shared the same hash key",
+        "C) Compressed Scan: Data was read from disk cache",
+        "D) Columnar Scan: Ultra-fast index reading"
+    ],
+    "A",
+    "`COLLSCAN` means a full collection scan occurred. On a collection with millions of documents, this causes high disk I/O, CPU consumption, and slow response times. An `IXSCAN` (Index Scan) should be targeted instead."
+)
+
+add_mcq("mid-mongo-04", "mongodb", "TTL Indexes",
+    "What is the function of a Time-To-Live (TTL) index in MongoDB?",
+    [
+        "A) It speeds up date comparisons by 50%",
+        "B) It automatically deletes documents after a specified number of seconds based on a Date field value",
+        "C) It logs the query execution duration",
+        "D) It enforces session timeout in Express"
+    ],
+    "B",
+    "TTL indexes are single-field indexes on date fields that MongoDB uses to automatically purge expired documents (e.g. sessions, verification codes, temporary logs) in the background."
+)
+
+add_mcq("mid-mongo-05", "mongodb", "Mongoose Pre/Post Hooks",
+    "Why must you use a regular function instead of an arrow function when defining a Mongoose `pre('save')` middleware hook that hashes a password?",
+    [
+        "A) Arrow functions are not supported in Node.js",
+        "B) Arrow functions lexically bind `this`, preventing Mongoose from binding `this` to the document instance being saved",
+        "C) Mongoose throws a syntax error if arrow functions are used anywhere",
+        "D) Regular functions execute asynchronously while arrow functions execute synchronously"
+    ],
+    "B",
+    "Mongoose binds `this` to the document being validated/saved. Arrow functions inherit the enclosing lexical scope, causing `this` to be undefined or global scope."
+)
+
+add_mcq("mid-mongo-06", "mongodb", "Partial Indexes",
+    "What is the advantage of a Partial Index in MongoDB?",
+    [
+        "A) It only indexes the first 5 characters of strings",
+        "B) It only indexes documents that meet a specified filter expression (`filterExpression`), saving disk space and write overhead",
+        "C) It splits the index across two servers",
+        "D) It only indexes every second row"
+    ],
+    "B",
+    "Partial indexes index only documents in a collection that satisfy a specified filter expression, reducing storage requirements and index maintenance overhead during document writes."
+)
+
+add_mcq("mid-mongo-07", "mongodb", "Mongoose Lean Queries",
+    "What is the performance advantage of using `.lean()` in Mongoose queries (e.g. `User.find().lean()`)?",
+    [
+        "A) It deletes unused columns",
+        "B) It returns plain JavaScript objects (POJOs) instead of heavy Mongoose Documents, bypassing Mongoose change-tracking overhead and speeding up reads by up to 5x",
+        "C) It converts documents to BSON files on disk",
+        "D) It compresses the network response"
+    ],
+    "B",
+    "Mongoose Documents instantiate internal change-tracking, getters, setters, and virtuals. `.lean()` skips this hydration, returning raw JavaScript objects which saves substantial memory and CPU on read-only queries."
+)
+
+add_mcq("mid-mongo-08", "mongodb", "Write Concern w: majority",
+    "What does setting Write Concern `{ w: 'majority' }` guarantee in a MongoDB replica set?",
+    [
+        "A) That only the primary node committed the write",
+        "B) That the write has been successfully acknowledged by a majority of data-bearing replica set members before returning success to the application",
+        "C) That all writes are encrypted with AES",
+        "D) That writes are replicated to every database on the internet"
+    ],
+    "B",
+    "`w: 'majority'` ensures durability against replica set failover. If the primary node crashes after acknowledging, the write is guaranteed to be present on whichever secondary is elected new primary."
+)
+
+add_mcq("mid-mongo-09", "mongodb", "Array Filters in Updates",
+    "Which MongoDB operator allows you to selectively update specific elements in an array based on a condition matching `arrayFilters`?",
+    [
+        "A) `$[<identifier>]`",
+        "B) `$$this`",
+        "C) `$*`",
+        "D) `->>`"
+    ],
+    "A",
+    "The filtered positional operator `$[<identifier>]` combined with the `arrayFilters` option allows updating specific elements within an array that meet fine-grained criteria."
+)
+
+add_mcq("mid-mongo-10", "mongodb", "$unwind Aggregation Stage",
+    "What does the `$unwind` stage do in a MongoDB aggregation pipeline?",
+    [
+        "A) It reverses the order of documents",
+        "B) It deconstructs an array field from the input documents to output a document for each element in the array",
+        "C) It decrypts hashed passwords",
+        "D) It deletes corrupt documents"
+    ],
+    "B",
+    "`$unwind` expands an array field, outputting one document per array item, preserving other fields. It is commonly used prior to `$group` to aggregate nested array items."
+)
+
+add_mcq("mid-mongo-11", "mongodb", "Mongoose Virtuals",
+    "What are Mongoose Virtuals?",
+    [
+        "A) Virtual machines running inside MongoDB",
+        "B) Document properties that you can get and set but that are NOT persisted to the MongoDB database storage",
+        "C) Temporary database collections",
+        "D) Mock data for unit testing"
+    ],
+    "B",
+    "Virtuals are calculated properties (e.g. `fullName` computed from `firstName` and `lastName`) that can be accessed like standard fields but do not consume storage in MongoDB."
+)
+
+add_mcq("mid-mongo-12", "mongodb", "Text Search Indexes",
+    "How do you perform full-text search across multiple string fields in MongoDB?",
+    [
+        "A) By running regex searches like `/word/i` on every column",
+        "B) By creating a `text` index on the fields and querying with `$text: { $search: 'keyword' }`",
+        "C) By exporting data to Elasticsearch only",
+        "D) Text search is not supported in MongoDB"
+    ],
+    "B",
+    "MongoDB provides native full-text search. Creating a `text` index tokenizes and stems words, enabling fast matching using the `$text` and `$search` query operators."
+)
+
+add_open("mid-mongo-13", "mongodb", "MongoDB Aggregation Pipeline",
+    "Write a MongoDB aggregation pipeline that finds the top 5 highest-spending customers. Assume an `orders` collection with `{ customerId, amount, status }`. Explain each stage.",
+    [
+        "Stage 1: $match { status: 'completed' } to filter irrelevant orders early",
+        "Stage 2: $group { _id: '$customerId', totalSpent: { $sum: '$amount' } }",
+        "Stage 3: $sort { totalSpent: -1 }",
+        "Stage 4: $limit 5"
+    ],
+    "```javascript\nawait db.orders.aggregate([\n  // 1. Filter completed orders first to minimize pipeline dataset\n  { $match: { status: 'completed' } },\n  \n  // 2. Group by customerId and sum order totals\n  {\n    $group: {\n      _id: '$customerId',\n      totalSpent: { $sum: '$amount' },\n      orderCount: { $sum: 1 }\n    }\n  },\n  \n  // 3. Sort by total expenditure in descending order\n  { $sort: { totalSpent: -1 } },\n  \n  // 4. Return top 5 records\n  { $limit: 5 },\n  \n  // 5. Optional: Project cleaner field names\n  {\n    $project: {\n      _id: 0,\n      customerId: '$_id',\n      totalSpent: 1,\n      orderCount: 1\n    }\n  }\n]);\n```"
+)
+
+add_open("mid-mongo-14", "mongodb", "Transactions in MongoDB",
+    "How do multi-document transactions work in MongoDB? What prerequisites are required, and what is the code pattern for committing or aborting a session?",
+    [
+        "Prerequisite: Requires a Replica Set or Sharded Cluster (not standalone)",
+        "Pattern: startSession(), session.startTransaction(), pass { session } to all operations",
+        "Commit with session.commitTransaction(), abort with session.abortTransaction(), always endSession() in finally block"
+    ],
+    "MongoDB supports multi-document ACID transactions on replica sets and sharded clusters:\n```javascript\nconst session = await mongoose.startSession();\nsession.startTransaction();\ntry {\n  await Account.updateOne({ _id: fromId }, { $inc: { balance: -amount } }, { session });\n  await Account.updateOne({ _id: toId }, { $inc: { balance: amount } }, { session });\n  \n  await session.commitTransaction();\n} catch (error) {\n  await session.abortTransaction();\n  throw error;\n} finally {\n  session.endSession();\n}\n```\nAll operations must receive the `{ session }` option so they are tracked atomically."
+)
+
+add_open("mid-mongo-15", "mongodb", "Optimizing MongoDB Indexes with ESR Rule",
+    "Given a collection `events` with queries like: `db.events.find({ tenantId: 'abc', category: 'auth', timestamp: { $gte: ISODate('2026-01-01') } }).sort({ timestamp: -1 })`, design the optimal compound index following the ESR rule and explain your reasoning.",
+    [
+        "Equality: tenantId and category",
+        "Sort: timestamp",
+        "Range: timestamp",
+        "Optimal index: { tenantId: 1, category: 1, timestamp: -1 }",
+        "Avoids in-memory sorting (SORT_KEY_GENERATOR / blocking sort)"
+    ],
+    "Following the ESR (Equality, Sort, Range) rule:\n1. Equality keys come first: `{ tenantId: 1, category: 1 }` narrows down the search space to the exact tenant and event category immediately.\n2. Sort keys come second: Here, the sort field and range field are both `timestamp`. Placing `timestamp: -1` next satisfies both the `sort({ timestamp: -1 })` without requiring an in-memory sort buffer and bounds the `$gte` range filter.\nOptimal Compound Index:\n`db.events.createIndex({ tenantId: 1, category: 1, timestamp: -1 })`\nThis allows MongoDB to perform an `IXSCAN` that traverses directly to the matching tenant/category, reads the index in sorted order, and terminates when the range boundary is reached."
+)
+
+add_open("mid-mongo-16", "mongodb", "NoSQL Injection Mitigation",
+    "Explain how a NoSQL injection vulnerability can occur in a MERN application when accepting raw JSON inputs (e.g. `{ username: 'admin', password: { $ne: null } }`), and how to defend against it.",
+    [
+        "Vulnerability: Passing unvalidated req.body directly to User.findOne(req.body) allows attackers to inject query operators like $ne, bypassing password checks",
+        "Defenses: Schema validation (Zod/Joi), sanitize inputs (express-mongo-sanitize) to strip keys starting with $, use explicit queries: User.findOne({ username: String(req.body.username) })"
+    ],
+    "Vulnerability Example:\nIf an Express route passes user input directly:\n`User.findOne({ email: req.body.email, password: req.body.password })`\nAn attacker can send a JSON payload:\n`{ \"email\": \"admin@corp.com\", \"password\": { \"$ne\": \"\" } }`\nBecause MongoDB evaluates `$ne` (not equal), the query resolves to 'find user where password is not empty string', authenticating the attacker without knowing the password!\nRemediation:\n1. Use `express-mongo-sanitize` middleware to automatically strip keys starting with `$` or `.` from `req.body`, `req.query`, and `req.params`.\n2. Use strict type validation (Zod) enforcing that passwords must be scalar strings: `z.string()`.\n3. Never compare passwords directly in database queries; use `bcrypt.compare()` against stored hashes."
+)
+
+add_open("mid-mongo-17", "mongodb", "Handling Large Files with GridFS",
+    "What is GridFS in MongoDB, when should it be used instead of standard BSON documents, and how does it split and store data internally?",
+    [
+        "Used when storing files exceeding the 16MB BSON document limit",
+        "Splits files into chunks of 255KB by default",
+        "Stores data in two collections: fs.files (metadata) and fs.chunks (binary binary data)"
+    ],
+    "GridFS is a specification for storing and retrieving files that exceed the 16MB BSON document size limit.\nArchitecture:\nInstead of storing a file in a single document, GridFS divides the file into discrete chunks (default size: 255 KB) and stores them across two collections:\n1. `fs.files`: Stores file metadata (filename, upload date, total length, contentType, md5 checksum).\n2. `fs.chunks`: Stores the binary data chunks with `{ files_id: ObjectId, n: chunkNumber, data: BinData }`.\nUse cases: Ideal for storing images, audio files, or reports directly in MongoDB when cloud object storage (S3) is unavailable."
+)
+
+add_open("mid-mongo-18", "mongodb", "Read Preferences in MongoDB Replica Sets",
+    "Explain the five MongoDB Read Preference modes: `primary`, `primaryPreferred`, `secondary`, `secondaryPreferred`, and `nearest`. What are the consistency trade-offs when reading from secondaries?",
+    [
+        "primary: All reads from primary (strong consistency, default)",
+        "secondary: Reads routed only to secondaries (eventual consistency, risk of stale reads)",
+        "secondaryPreferred / primaryPreferred: Fallback order",
+        "nearest: Reads from node with lowest network latency",
+        "Trade-off: Secondaries replicate asynchronously; reading from secondaries can return stale data"
+    ],
+    "Read Preferences determine how client drivers route read operations across replica set nodes:\n1. `primary` (Default): All reads go to the primary node. Guarantees strong consistency.\n2. `primaryPreferred`: Reads from primary if available; falls back to secondary if primary is down.\n3. `secondary`: Reads exclusively from secondary members. Useful for dedicated analytical reporting queries.\n4. `secondaryPreferred`: Reads from secondaries first; falls back to primary if no secondary is reachable.\n5. `nearest`: Measures network latency (ping) and routes to the closest node regardless of primary/secondary status.\nTrade-off: MongoDB replication is asynchronous. Reading from secondaries trades strong read-your-own-writes consistency for read throughput, which can expose users to stale or out-of-date records."
+)
+
+# ==================== POSTGRESQL (MID-LEVEL: 18 Qs) ====================
+add_mcq("mid-pg-01", "postgresql", "Common Table Expressions (CTEs)",
+    "What is the purpose of the `WITH` clause (Common Table Expression) in PostgreSQL?",
+    [
+        "A) To establish an SSL connection with a password",
+        "B) To define a temporary named result set that exists only for the duration of a single query, improving readability and enabling recursive queries",
+        "C) To create a permanent table on disk",
+        "D) To add a user role to the database"
+    ],
+    "B",
+    "CTEs provide modular, readable query structures by defining temporary named result sets. They can also perform hierarchical and graph traversals via `WITH RECURSIVE`."
+)
+
+add_mcq("mid-pg-02", "postgresql", "Transaction Isolation Levels",
+    "What is a 'Non-Repeatable Read' and at which transaction isolation level is it prevented in PostgreSQL?",
+    [
+        "A) When a transaction reads uncommitted data; prevented in Read Uncommitted",
+        "B) When a transaction re-reads a row and finds that another committed transaction modified its data; prevented in `REPEATABLE READ` and `SERIALIZABLE`",
+        "C) When an index fails to read a row",
+        "D) When two transactions write to the same table simultaneously"
+    ],
+    "B",
+    "A Non-Repeatable Read occurs when a transaction reads the same row twice and observes different values because another transaction committed an update in between. `REPEATABLE READ` snapshots the data at transaction start, preventing this anomaly."
+)
+
+add_mcq("mid-pg-03", "postgresql", "GIN Indexes for JSONB",
+    "Why are GIN (Generalized Inverted Index) indexes preferred over B-Tree indexes when querying keys or elements inside PostgreSQL `JSONB` columns?",
+    [
+        "A) B-Tree indexes cannot index JSONB at all",
+        "B) GIN indexes store key/value pairs internally as inverted index entries, allowing fast containment queries (`@>`, `?`, `?&`) against arbitrary nested keys",
+        "C) GIN indexes consume 90% less disk space than B-Trees",
+        "D) GIN indexes automatically repair corrupt disks"
+    ],
+    "B",
+    "A GIN index creates an inverted index mapping internal keys and values to row locations. This allows fast searches with the containment operator `@>`, whereas standard B-Tree indexes only index the entire JSON document as a scalar value."
+)
+
+add_mcq("mid-pg-04", "postgresql", "Window Functions",
+    "What is the difference between a Window Function (e.g. `ROW_NUMBER() OVER (...)`) and a regular Aggregate Function with `GROUP BY`?",
+    [
+        "A) Window functions delete duplicate rows",
+        "B) Window functions perform calculations across a set of table rows without collapsing the individual rows into a single summary output",
+        "C) Window functions only run on Windows OS",
+        "D) Aggregate functions cannot calculate sums"
+    ],
+    "B",
+    "`GROUP BY` aggregates collapse multiple rows into a single output row. Window functions compute running totals, rankings, or moving averages while retaining each individual row in the output."
+)
+
+add_mcq("mid-pg-05", "postgresql", "Foreign Key Indexes",
+    "Does PostgreSQL automatically create an index on child table columns defined with a FOREIGN KEY constraint?",
+    [
+        "A) Yes, PostgreSQL automatically creates a B-Tree index on all foreign keys",
+        "B) No, PostgreSQL automatically creates indexes for PRIMARY KEY and UNIQUE constraints, but NOT for FOREIGN KEY constraints; developers must manually index foreign keys to prevent sequential scans during joins and deletes",
+        "C) Foreign keys cannot be indexed",
+        "D) Only if the column name ends with `_id`"
+    ],
+    "B",
+    "PostgreSQL does NOT automatically index foreign key columns. If you frequently join on that column or delete records from the parent table, omitting an index on the foreign key can lead to slow full table scans."
+)
+
+add_mcq("mid-pg-06", "postgresql", "Database Connection Pool Tuning",
+    "What is the formula guideline popularized by PostgreSQL developers for calculating optimal connection pool size: `connections = ((core_count * 2) + effective_spindle_count)`?",
+    [
+        "A) To demonstrate that opening thousands of concurrent DB connections improves speed",
+        "B) To prevent context-switching thrashing and memory exhaustion by proving that a small pool of active connections matching CPU cores delivers highest throughput",
+        "C) It applies only to USB flash drives",
+        "D) To limit connections to 5 for all servers"
+    ],
+    "B",
+    "Contrary to intuition, allowing thousands of concurrent PostgreSQL connections causes CPU context-switching thrashing, cache eviction, and lock contention. A smaller, well-tuned pool delivers significantly higher query throughput."
+)
+
+add_mcq("mid-pg-07", "postgresql", "UPSERT with ON CONFLICT",
+    "Which SQL clause in PostgreSQL handles atomic 'insert or update' (UPSERT) operations without throwing duplicate key errors?",
+    [
+        "A) `INSERT OR REPLACE`",
+        "B) `INSERT INTO ... ON CONFLICT (key) DO UPDATE SET ...`",
+        "C) `MERGE INTO ...`",
+        "D) `IF EXISTS UPDATE ELSE INSERT`"
+    ],
+    "B",
+    "PostgreSQL's `ON CONFLICT (target) DO UPDATE SET ...` or `ON CONFLICT DO NOTHING` provides an atomic UPSERT mechanism that resolves uniqueness conflicts safely."
+)
+
+add_mcq("mid-pg-08", "postgresql", "Materialized Views",
+    "What is the primary difference between a standard SQL View and a Materialized View in PostgreSQL?",
+    [
+        "A) A standard View saves query results to physical disk; a Materialized view does not",
+        "B) A standard View runs its underlying query dynamically on every invocation; a Materialized View caches the computed result set physically on disk and must be explicitly refreshed (`REFRESH MATERIALIZED VIEW`)",
+        "C) Materialized views cannot be indexed",
+        "D) Standard views can only query one table"
+    ],
+    "B",
+    "Materialized Views physically persist the query result to disk, allowing lightning-fast reads and index creation on complex aggregations, at the cost of requiring scheduled refreshes."
+)
+
+add_mcq("mid-pg-09", "postgresql", "Partial Index in PostgreSQL",
+    "When should a Partial Index (e.g. `CREATE INDEX ON orders (user_id) WHERE status = 'unpaid';`) be used?",
+    [
+        "A) When you only have enough RAM for half an index",
+        "B) When a large majority of queries filter on a specific subset of data (like active jobs or unpaid invoices), reducing index size and maintenance cost",
+        "C) When ordering columns alphabetically",
+        "D) When columns contain encrypted data"
+    ],
+    "B",
+    "A Partial Index includes a `WHERE` clause, indexing only rows meeting the condition. It keeps index size tiny and fast to traverse for common filtered queries."
+)
+
+add_mcq("mid-pg-10", "postgresql", "JSONB Operators",
+    "What is the difference between `->` and `->>` when extracting fields from a PostgreSQL `JSONB` column?",
+    [
+        "A) `->` returns the value as a `JSONB` object, while `->>` returns the value as plain `TEXT`",
+        "B) `->>` returns JSON; `->` returns XML",
+        "C) `->` deletes the field",
+        "D) They are completely identical aliases"
+    ],
+    "A",
+    "`data->'user'` returns a JSONB element (which can be further chained e.g. `->'address'->>'city'`), whereas `data->>'name'` extracts the scalar value as a PostgreSQL `TEXT` string."
+)
+
+add_mcq("mid-pg-11", "postgresql", "Savepoints in Transactions",
+    "What does the `SAVEPOINT savepoint_name` command do inside a PostgreSQL transaction?",
+    [
+        "A) It writes the database backup to an S3 bucket",
+        "B) It marks a point in the transaction that can be rolled back to (`ROLLBACK TO SAVEPOINT`) without aborting the entire transaction",
+        "C) It commits all previous statements permanently",
+        "D) It pauses execution until the user presses enter"
+    ],
+    "B",
+    "Savepoints allow nested error handling within a transaction. If an individual statement errors out, you can roll back to the savepoint and continue executing remaining statements rather than losing the entire transaction."
+)
+
+add_mcq("mid-pg-12", "postgresql", "NULLS FIRST / LAST in ORDER BY",
+    "In PostgreSQL, where do NULL values appear by default in an `ORDER BY column ASC` query, and how do you change it?",
+    [
+        "A) NULL values appear last by default; change using `NULLS FIRST`",
+        "B) NULL values appear last by default in ASC; cannot be changed",
+        "C) NULL values appear last in DESC, first in ASC",
+        "D) NULL values are always excluded from ORDER BY"
+    ],
+    "A",
+    "In PostgreSQL, `ASC` sorts `NULLS LAST` by default, and `DESC` sorts `NULLS FIRST` by default. You can explicitly override this with `ORDER BY column ASC NULLS FIRST`."
+)
+
+add_open("mid-pg-13", "postgresql", "Query Optimization with EXPLAIN ANALYZE",
+    "What information does `EXPLAIN ANALYZE` provide in PostgreSQL, and how do you identify a performance bottleneck (such as an unintentional sequential scan or disk spill)?",
+    [
+        "EXPLAIN shows the planner cost estimate; ANALYZE actually executes the query and shows real runtime, loops, and row counts",
+        "Bottleneck signs: Seq Scan on large table (missing index), high execution time vs planning time, Rows Removed by Filter, Sort Method: external merge disk (work_mem too low)"
+    ],
+    "`EXPLAIN ANALYZE` executes the SQL statement and reports real execution statistics alongside the query planner's estimates:\n1. Execution Plan: Breaks down node operations (Seq Scan, Index Scan, Bitmap Heap Scan, Nested Loop, Hash Join).\n2. Critical Indicators:\n- `Seq Scan`: Inspect if a large table is scanned sequentially; indicates a missing index on the `WHERE` or `JOIN` column.\n- `Rows Removed by Filter`: If millions of rows were scanned only to discard 99.9% of them, an index is urgently needed.\n- `Sort Method: external merge Disk`: Indicates the sort operation exceeded `work_mem` and spilled to disk, severely slowing down the query.\n- Discrepancy between `cost` estimate rows and `actual rows`: Indicates outdated table statistics; resolved by running `ANALYZE table_name`."
+)
+
+add_open("mid-pg-14", "postgresql", "PostgreSQL ACID Isolation Levels & Anomalies",
+    "Contrast the four SQL standard isolation levels: Read Uncommitted, Read Committed, Repeatable Read, and Serializable. What anomalies (Dirty Read, Non-Repeatable Read, Phantom Read, Serialization Anomaly) can occur in each?",
+    [
+        "PostgreSQL treats Read Uncommitted as Read Committed (dirty reads are impossible in Postgres due to MVCC)",
+        "Read Committed: Default; prevents dirty reads, allows non-repeatable reads and phantom reads",
+        "Repeatable Read: Prevents dirty reads and non-repeatable reads; prevents phantom reads in PostgreSQL",
+        "Serializable: Guarantees serializable execution; prevents serialization anomalies (e.g. write skew) via predicate locks (SSI)"
+    ],
+    "1. Read Uncommitted: In standard SQL, allows dirty reads. However, in PostgreSQL, it behaves identically to Read Committed because PostgreSQL's MVCC architecture never reads uncommitted tuples.\n2. Read Committed (PostgreSQL Default): Each query in a transaction sees a snapshot of committed data at the moment that specific query begins. Prevents Dirty Reads, but allows Non-Repeatable Reads.\n3. Repeatable Read: The entire transaction sees a snapshot taken when the first query in the transaction began. Prevents Dirty Reads, Non-Repeatable Reads, and Phantom Reads.\n4. Serializable: The strictest level. Simulates serial transaction execution using Serializable Snapshot Isolation (SSI) to prevent Serialization Anomalies (such as Write Skew), aborting conflicting transactions with a retry error."
+)
+
+add_open("mid-pg-15", "postgresql", "Recursive CTE for Hierarchical Data",
+    "Write a PostgreSQL recursive CTE (`WITH RECURSIVE`) to query an organizational hierarchy (employees and managers) starting from the CEO down to all direct and indirect reports.",
+    [
+        "WITH RECURSIVE subordinates AS (...)",
+        "Base query: SELECT id, name, manager_id, 1 as level FROM employees WHERE manager_id IS NULL",
+        "UNION ALL recursive query: SELECT e.id, e.name, e.manager_id, s.level + 1 FROM employees e JOIN subordinates s ON e.manager_id = s.id",
+        "SELECT * FROM subordinates ORDER BY level"
+    ],
+    "```sql\nWITH RECURSIVE OrgChart AS (\n  -- 1. Anchor member: Find root CEO\n  SELECT id, name, manager_id, 1 AS depth\n  FROM employees\n  WHERE manager_id IS NULL\n  \n  UNION ALL\n  \n  -- 2. Recursive member: Join subordinates to previous result\n  SELECT e.id, e.name, e.manager_id, o.depth + 1\n  FROM employees e\n  INNER JOIN OrgChart o ON e.manager_id = o.id\n)\nSELECT * FROM OrgChart ORDER BY depth, name;\n```\nHow it works: The anchor member executes once. The recursive member runs iteratively on the previous iteration's output until no further subordinate rows match, traversing the tree without hardcoded join depths."
+)
+
+add_open("mid-pg-16", "postgresql", "Window Functions in Production Queries",
+    "Explain how `DENSE_RANK()` and `ROW_NUMBER()` differ when partitioning data. Write a query finding the top 3 highest-paid employees in each department.",
+    [
+        "ROW_NUMBER assigns distinct consecutive integers (1, 2, 3...) regardless of ties",
+        "DENSE_RANK assigns identical rank to ties without skipping subsequent ranks (1, 2, 2, 3)",
+        "Query uses CTE with DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) where rank <= 3"
+    ],
+    "```sql\nWITH RankedSalaries AS (\n  SELECT \n    id,\n    name,\n    department_id,\n    salary,\n    DENSE_RANK() OVER (\n      PARTITION BY department_id \n      ORDER BY salary DESC\n    ) AS salary_rank\n  FROM employees\n)\nSELECT id, name, department_id, salary, salary_rank\nFROM RankedSalaries\nWHERE salary_rank <= 3\nORDER BY department_id, salary_rank;\n```\nDifference: `ROW_NUMBER()` always assigns unique numbers (1, 2, 3) arbitrarily breaking ties. `DENSE_RANK()` awards identical ranks to ties without skipping numbers (if two employees share rank 2, the next receives rank 3)."
+)
+
+add_open("mid-pg-17", "postgresql", "PostgreSQL Connection Pooling with pg.Pool",
+    "Explain how connection pooling works with the `pg` library in Node.js. What is the danger of running `const client = await pool.connect()` without a `try/finally client.release()` block?",
+    [
+        "Pool maintains warm persistent connections to avoid expensive TCP/SSL connection handshakes",
+        "pool.query() acquires and releases automatically",
+        "pool.connect() gives exclusive client checkout for transactions; must client.release() in finally",
+        "Failure to release causes connection pool exhaustion / starvation where incoming requests hang forever"
+    ],
+    "PostgreSQL creates a dedicated OS process per connection. Setting up a connection costs significant CPU and latency. `pg.Pool` maintains a cache of active connections.\nSafe Pattern:\n```javascript\nconst client = await pool.connect();\ntry {\n  await client.query('BEGIN');\n  await client.query('UPDATE accounts SET balance = balance - $1 WHERE id = $2', [100, fromId]);\n  await client.query('UPDATE accounts SET balance = balance + $1 WHERE id = $2', [100, toId]);\n  await client.query('COMMIT');\n} catch (err) {\n  await client.query('ROLLBACK');\n  throw err;\n} finally {\n  client.release(); // Crucial: returns client back to pool\n}\n```\nDanger: If `client.release()` is omitted or bypassed due to an unhandled exception, that connection remains checked out indefinitely. Once all pool connections (default: 10) are leaked, all subsequent queries queue and freeze until the application crashes."
+)
+
+add_open("mid-pg-18", "postgresql", "Database Normalization BCNF and Denormalization",
+    "Explain Boyce-Codd Normal Form (BCNF) and describe a real-world scenario in a PERN e-commerce system where intentional denormalization is preferred over strict normalization.",
+    [
+        "BCNF: Stricter version of 3NF where for every functional dependency X -> Y, X must be a superkey",
+        "Denormalization scenario: E-commerce Order Items storing snapshot of product price and product name at time of purchase",
+        "If normalized to product table, changing product price today would retroactively change historical order totals and invoices!"
+    ],
+    "1. BCNF: A table is in BCNF if it is in 3NF and for every non-trivial functional dependency `X -> Y`, the determinant `X` is a candidate key (superkey).\n2. Real-World Denormalization Scenario:\nIn an e-commerce database, an `order_items` table should store `price_at_purchase` and `product_title` directly, rather than relying exclusively on a foreign key to the `products` table.\nWhy denormalize:\n- Business Integrity: If the store owner updates the product price from $50 to $75 next month, a strictly normalized query would recalculate historical order totals incorrectly, corrupting accounting and receipts.\n- Performance: Avoids multi-table joins on high-throughput order history pages."
+)
+
+# ==================== FULLSTACK / SECURITY / ARCHITECTURE (MID-LEVEL: 14 Qs) ====================
+add_mcq("mid-full-01", "fullstack", "CSRF Protection",
+    "How does the `SameSite=Strict` cookie attribute help defend against Cross-Site Request Forgery (CSRF)?",
+    [
+        "A) It prevents the cookie from being accessed over HTTP",
+        "B) It instructs the browser never to send the cookie in cross-site requests (e.g. following a link or submitting a form from an external domain)",
+        "C) It encrypts the user's password using AES-GCM",
+        "D) It only sends cookies if the user has completed a CAPTCHA"
+    ],
+    "B",
+    "With `SameSite=Strict`, the browser will not send the cookie along with cross-site requests initiated by third-party origins, preventing attackers from forging authenticated requests on behalf of victims."
+)
+
+add_mcq("mid-full-02", "fullstack", "Redis Cache-Aside Pattern",
+    "How does the 'Cache-Aside' (Lazy Loading) caching pattern work with Redis in a PERN/MERN application?",
+    [
+        "A) Redis automatically executes SQL queries and caches all tables",
+        "B) The application first checks Redis for the data; on cache hit, it returns immediately; on cache miss, it queries the database, writes the result to Redis with a TTL, and returns",
+        "C) All writes go only to Redis; the database is never updated",
+        "D) Data is written to Redis only when the server restarts"
+    ],
+    "B",
+    "In the Cache-Aside pattern, the application orchestrates reads: check cache -> if miss, read database -> populate cache with TTL -> return to client. This ensures only frequently requested data consumes cache RAM."
+)
+
+add_mcq("mid-full-03", "fullstack", "Cursor-Based vs Offset Pagination",
+    "Why is cursor-based pagination superior to `OFFSET / LIMIT` pagination for large, continuously updating feeds?",
+    [
+        "A) Cursor-based pagination works without a database",
+        "B) `OFFSET` requires the database to scan and discard all preceding offset rows (O(N) cost), and causes duplicate or skipped records when items are inserted concurrently",
+        "C) Offset pagination cannot sort ascending",
+        "D) Browsers do not support offset numbers higher than 1000"
+    ],
+    "B",
+    "`OFFSET 100000` forces the database engine to fetch and count 100,000 rows only to discard them. Cursor pagination filters by index (`WHERE id < last_seen_id ORDER BY id DESC LIMIT 20`), which is O(1) indexed lookup and immune to page-drift anomalies."
+)
+
+add_mcq("mid-full-04", "fullstack", "WebSockets vs Server-Sent Events",
+    "When is Server-Sent Events (SSE) a simpler and better choice than WebSockets for a PERN/MERN app?",
+    [
+        "A) When you need full-duplex two-way communication like an online multiplayer game",
+        "B) When the communication is strictly unidirectional from server to client (e.g. live notifications, stock tickers, AI text streaming) over standard HTTP",
+        "C) When binary data must be transferred over UDP",
+        "D) When clients are offline"
+    ],
+    "B",
+    "SSE runs over standard HTTP, natively supports automatic reconnection and event IDs, bypasses corporate firewalls easily, and is ideal when data only flows from server to client (like LLM token streaming)."
+)
+
+add_mcq("mid-full-05", "fullstack", "Docker Multi-Stage Builds",
+    "What is the primary benefit of using multi-stage builds in a Dockerfile for a React or Node.js application?",
+    [
+        "A) It allows running multiple Linux distributions on the same CPU",
+        "B) It separates the build environment (Node, npm dependencies, compilers) from the slim production runtime image (e.g. Nginx or alpine), resulting in dramatically smaller and more secure images",
+        "C) It bypasses Docker licensing requirements",
+        "D) It increases the RAM limit of Docker containers"
+    ],
+    "B",
+    "Multi-stage builds leave behind development tools, npm devDependencies, and intermediate build artifacts in the builder stage, copying only production assets into the final runtime container."
+)
+
+add_mcq("mid-full-06", "fullstack", "Content Security Policy (CSP)",
+    "What attack vector is primarily mitigated by a strictly configured Content-Security-Policy (CSP) HTTP header?",
+    [
+        "A) SQL Injection",
+        "B) Cross-Site Scripting (XSS) and data injection by restricting what domains can load scripts, styles, and images",
+        "C) Denial of Service (DoS)",
+        "D) Hardware failure"
+    ],
+    "B",
+    "CSP instructs the browser which origins and domains are authorized to execute scripts or load resources, neutralizing reflected and stored XSS attacks by refusing to execute unauthorized inline or third-party scripts."
+)
+
+add_mcq("mid-full-07", "fullstack", "Idempotency Keys",
+    "Why do payment gateways (like Stripe) require clients to send an `Idempotency-Key` header with payment requests?",
+    [
+        "A) To encrypt credit card numbers",
+        "B) To ensure that if a network timeout occurs and the client retries the POST request, the payment is processed exactly once rather than charging the customer twice",
+        "C) To calculate sales tax",
+        "D) To sign in with Apple Pay"
+    ],
+    "B",
+    "An Idempotency Key is a unique identifier generated by the client. The server records the key and cached response; any subsequent request with the same key returns the existing receipt rather than executing a duplicate charge."
+)
+
+add_mcq("mid-full-08", "fullstack", "Webhook HMAC Signatures",
+    "How does an Express server verify that an incoming Webhook payload truly originated from Stripe or GitHub and was not forged by an attacker?",
+    [
+        "A) By trusting the `User-Agent` header",
+        "B) By computing an HMAC-SHA256 hash of the raw request body using a shared secret and comparing it to the signature in the webhook header (`timingSafeEqual`)",
+        "C) By checking the client IP against Wikipedia",
+        "D) By asking the user for their password"
+    ],
+    "B",
+    "Webhooks use HMAC signatures. The provider hashes the raw payload with a pre-shared secret. The receiving server recalculates the hash from the raw bytes and compares them using constant-time comparison to prevent timing attacks."
+)
+
+add_open("mid-full-09", "fullstack", "Designing a Scalable Auth System (JWT Refresh Token Rotation)",
+    "Explain how Refresh Token Rotation works in an authentication architecture. How does it mitigate the threat of stolen refresh tokens, and where should tokens be stored?",
+    [
+        "Access tokens have short lifespan (e.g. 15 minutes) and are stored in memory",
+        "Refresh tokens have longer lifespan (e.g. 7 days) and are stored in HttpOnly, Secure, SameSite cookies",
+        "Token Rotation: Whenever a refresh token is used to issue a new access token, the old refresh token is invalidated and a new one is issued",
+        "Breach detection: If an invalidated refresh token is reused, all refresh tokens for that family/user are immediately revoked (reuse detection)"
+    ],
+    "1. Token Lifetimes: Access Tokens are short-lived (10-15 minutes) to minimize damage if intercepted. Refresh Tokens are long-lived (7-30 days).\n2. Storage: Refresh tokens are stored in `HttpOnly`, `Secure`, `SameSite=Strict` cookies to block XSS and CSRF.\n3. Rotation: When `/api/auth/refresh` is called, the server validates the refresh token, revokes it in the database/Redis, and issues both a new access token and a brand-new refresh token.\n4. Automatic Breach Detection: If an attacker steals a refresh token and uses it after the legitimate user has already rotated it, the server detects reuse of an invalidated token. It immediately invalidates the entire token family, logging out the user across all devices and neutralizing the compromised session."
+)
+
+add_open("mid-full-10", "fullstack", "Cache Invalidation Strategies with Redis",
+    "Contrast Write-Through, Write-Back (Write-Behind), and Cache-Aside (Lazy Loading) caching patterns. What are the consistency trade-offs of each?",
+    [
+        "Cache-Aside: App reads cache, misses read DB and write to cache; writes update DB and invalidate cache. Simple, resilient",
+        "Write-Through: App writes to cache; cache synchronously writes to DB before returning. Strong consistency, higher write latency",
+        "Write-Back: App writes to cache; cache asynchronously writes to DB in batches. Fastest writes, risk of data loss if cache crashes before flush"
+    ],
+    "1. Cache-Aside (Lazy Loading):\n- Flow: Application queries cache; on miss, loads from DB and writes to cache. On DB update, application invalidates (deletes) the cached key.\n- Trade-offs: Resilient to cache crashes, but incurs cache misses on initial reads.\n2. Write-Through:\n- Flow: Application writes to cache, and the cache engine synchronously persists to the database before confirming success.\n- Trade-offs: Ensures cache is always up to date and consistent, but adds latency to every write operation.\n3. Write-Back (Write-Behind):\n- Flow: Application writes immediately to cache. The cache engine batches writes and flushes them asynchronously to the database.\n- Trade-offs: Extremely high write throughput, but risks permanent data loss if the cache server experiences hardware failure before flushing."
+)
+
+add_open("mid-full-11", "fullstack", "Implementing Rate Limiting with Redis Sliding Window",
+    "Describe the algorithm for a Sliding Window Log rate limiter using Redis sorted sets (`ZADD`, `ZREMRANGEBYSCORE`, `ZCARD`). Why is it more accurate than a fixed window counter?",
+    [
+        "Fixed window problem: Traffic burst at boundary (e.g. 100 requests at 0:59 and 100 requests at 1:01) allows 2x limit",
+        "Sliding window uses Redis Sorted Set (ZSET) where members and scores are timestamps",
+        "Steps: Remove timestamps older than (now - windowSize) with ZREMRANGEBYSCORE; count remaining elements with ZCARD; if count < limit, ZADD now and allow; else reject 429"
+    ],
+    "Fixed window counters reset every minute, permitting an attacker to send 100 requests at second 59 and 100 requests at second 01, doubling the allowed quota across the boundary.\nSliding Window Log Algorithm:\n1. Use a Redis Sorted Set (`ZSET`) keyed by client IP (`ratelimit:user_123`).\n2. Clear expired timestamps: `ZREMRANGEBYSCORE ratelimit:user_123 0 (currentTime - windowDuration)`.\n3. Count active requests within the window: `ZCARD ratelimit:user_123`.\n4. If count is below limit: Add current timestamp: `ZADD ratelimit:user_123 currentTime currentTime`, set `EXPIRE`, and proceed.\n5. If count exceeds limit: Deny request with HTTP `429 Too Many Requests`.\nThis provides precision rate limiting without boundary burst exploits."
+)
+
+add_open("mid-full-12", "fullstack", "Preventing the Top 3 OWASP Web Vulnerabilities",
+    "Explain the mechanisms and practical code defenses against the top three OWASP vulnerabilities in a PERN/MERN stack: Injection (SQL/NoSQL), Cross-Site Scripting (XSS), and Broken Object Level Authorization (BOLA/IDOR).",
+    [
+        "Injection: Parameterized queries in Postgres ($1), schema validation and sanitization in Mongo",
+        "XSS: React auto-escaping, avoiding dangerouslySetInnerHTML, setting Content-Security-Policy (CSP) and HttpOnly cookies",
+        "BOLA/IDOR: Verifying ownership in database queries: WHERE id = $1 AND user_id = $req.user.id instead of trusting client-supplied IDs"
+    ],
+    "1. Injection (SQL & NoSQL):\n- Cause: Concatenating untrusted user input directly into SQL strings or passing raw JSON operators (`$ne`) to Mongo.\n- Defense: Strictly use parameterized queries (`$1, $2`), ORMs with prepared statements, and validate incoming payload shapes with Zod.\n2. Cross-Site Scripting (XSS):\n- Cause: Untrusted JavaScript rendered into the browser DOM.\n- Defense: React automatically escapes strings inside JSX `{expression}`. Never use `dangerouslySetInnerHTML` without DOMPurify sanitization. Use `HttpOnly` cookies and strict CSP headers.\n3. Broken Object Level Authorization (BOLA / IDOR):\n- Cause: A user modifies an endpoint `/api/documents/502` to `/api/documents/503` and accesses someone else's document because the server only verified the user is logged in, not that they own record 503.\n- Defense: Always enforce ownership checks in data access queries: `SELECT * FROM documents WHERE id = $1 AND owner_id = $req.user.id`."
+)
+
+add_open("mid-full-13", "fullstack", "Zero-Downtime Database Migrations",
+    "Explain the 'Expand and Contract' (Parallel Run) database migration pattern when making a breaking change (such as renaming or splitting a column) without taking the PERN/MERN API offline.",
+    [
+        "Phase 1 (Expand): Add new column alongside old column without dropping old column",
+        "Phase 2 (Dual-write): Deploy backend code that writes to both old and new columns, reading from old column (or fallback)",
+        "Phase 3 (Backfill): Run background script backfilling existing historical rows from old column to new column",
+        "Phase 4 (Read switch): Switch backend code to read exclusively from new column",
+        "Phase 5 (Contract): Remove dual-write logic and safely DROP old column in database"
+    ],
+    "Renaming a column directly (`ALTER TABLE users RENAME COLUMN name TO full_name`) instantly breaks running application instances that still expect `name`, causing downtime.\nThe Expand and Contract pattern solves this in 5 seamless phases:\n1. Expand: Add `full_name` column as nullable.\n2. Dual-Write: Deploy application code that reads from `name` but writes updates to both `name` and `full_name`.\n3. Backfill: Run a background batch worker copying existing data from `name` to `full_name` across historical rows.\n4. Read Switch: Deploy update switching reads to `full_name`.\n5. Contract: Stop writing to `name`, deploy code, and run `ALTER TABLE users DROP COLUMN name`."
+)
+
+add_open("mid-full-14", "fullstack", "WebSocket Connection Lifecycle and Scaling",
+    "Explain how WebSocket connection upgrades work from an initial HTTP request. What architectural bottlenecks occur when scaling a real-time Express/WebSocket server across multiple load-balanced instances, and how does Redis Pub/Sub resolve them?",
+    [
+        "Upgrade: HTTP GET with Connection: Upgrade and Upgrade: websocket headers; server returns 101 Switching Protocols",
+        "Scaling bottleneck: WebSockets are persistent stateful TCP connections; client A on Server 1 cannot talk to client B on Server 2",
+        "Solution: Redis Pub/Sub backplane; when Server 1 receives a message, it publishes to Redis channel; all server instances receive it and broadcast to their local connected sockets"
+    ],
+    "1. Upgrade Handshake: The client sends a standard HTTP GET request with `Upgrade: websocket` and `Connection: Upgrade` headers along with a `Sec-WebSocket-Key`. The server returns HTTP `101 Switching Protocols`, transitioning the TCP socket into a persistent, bidirectional binary/text WebSocket connection.\n2. Multi-Server Scaling Problem: Unlike stateless REST APIs, WebSockets are stateful persistent TCP connections pinned to a single server instance. If User A is connected to Server 1 and User B is connected to Server 2, Server 1 has no direct way to send messages to User B.\n3. Redis Pub/Sub Solution: Introduce a Redis Pub/Sub message broker backplane (e.g. Socket.io Redis adapter). When Server 1 needs to broadcast a message to a room, it publishes the payload to a Redis channel. Every server instance subscribed to the Redis channel receives the message and pushes it out to its locally connected WebSocket clients."
+)
+
+with open("/workspaces/preppro/src/data/mid.json", "w") as f:
+    json.dump(questions, f, indent=2)
+
+print(f"Generated {len(questions)} Mid-Level questions in /workspaces/preppro/src/data/mid.json")
